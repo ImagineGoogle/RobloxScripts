@@ -17,10 +17,6 @@ GuiLibrary:CreateWindow("World")
 
 local invisibilityConnections = {}
 
-GuiLibrary:CreateModule("Blatant", "KillAura", function(callback)
-    
-end)
-
 GuiLibrary:CreateModule("Blatant", "Invisibility", function(callback)
     if callback then
         local function charAdded(character)
@@ -33,13 +29,11 @@ GuiLibrary:CreateModule("Blatant", "Invisibility", function(callback)
                 tag:Destroy()
             end
 
-            local newroot = character.LowerTorso.Root:Clone()
             hrp.Parent = workspace
             character.PrimaryPart = hrp
             character:MoveTo(Vector3.new(old.X,9e9,old.Z))
             hrp.Parent = character
             task.wait(0.5)
-            newroot.Parent = hrp
             hrp.CFrame = old
         end
         if lplr.Character then
@@ -47,7 +41,7 @@ GuiLibrary:CreateModule("Blatant", "Invisibility", function(callback)
         end
         invisibilityConnections.characterAdded = lplr.CharacterAdded:Connect(charAdded)
     else
-        for _, connection in ipairs(invisibilityConnections) do
+        for _, connection in pairs(invisibilityConnections) do
             print("E")
             if typeof(connection) == "RBXScriptConnection" then
                 connection:Disconnect()
