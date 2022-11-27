@@ -34,7 +34,8 @@ local staff = {
 local function createNotif(title, text)
     game:GetService("StarterGui"):SetCore("SendNotification",{
         Title = title,
-        Text = text
+        Text = text,
+        Duration = 8
     })
 end
 
