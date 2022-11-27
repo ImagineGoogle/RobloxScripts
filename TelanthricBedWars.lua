@@ -15,6 +15,17 @@ GuiLibrary.CreateWindow("Render")
 GuiLibrary.CreateWindow("Utility")
 GuiLibrary.CreateWindow("World")
 
+local function isAlive()
+    if lplr and lplr.Character then
+        if not (lplr.Character:FindFirstChild("HumanoidRootPart") and lplr.Character:FindFirstChild("Humanoid")) then
+            return
+        end
+        if lplr.Character.Humanoid.Health > 0 then
+            return true
+        end
+    end
+end
+
 local connections = {
     Invisibility = {},
     RemoveNameTag = {}
@@ -70,14 +81,19 @@ GuiLibrary.CreateModule("Utility", "RemoveNameTag", function(callback)
     end
 end)
 
-local args = {
-    [1] = {
-        [1] = {
-            [1] = "\22",
-            [2] = "\2100\152d\218\13I\254\173\160\221\212\179\22\209\188",
-            [3] = "OneVsOne"
-        }
-    }
-}
-
-game:GetService("ReplicatedStorage").RemoteEvent:FireServer(unpack(args))
+GuiLibrary.CreateModule("Utility", "GetEmeralds", function(callback)
+    if callback then
+        if not isAlive() then return end
+        local emeralds = workspace.Drops:FindFirstChild("emerald")
+        if emeralds then
+            local oldCFrame = lplr.Character.HumanoidRootPart.CFrame
+            for _, emerald in pairs(emeralds:GetChildren()) do
+                if isAlive() then
+                    lplr.Character.HumanoidRootPart.CFrame = emerald.DropBox.CFrame
+                    task.wait(0.1)
+                end
+            end
+            lplr.Character.HumanoidRootPart.CFrame = oldCFrame
+        end
+    end
+end)
