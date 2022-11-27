@@ -15,7 +15,10 @@ GuiLibrary:CreateWindow("Render")
 GuiLibrary:CreateWindow("Utility")
 GuiLibrary:CreateWindow("World")
 
-local invisibilityConnections = {}
+local connections = {
+    Invisibility = {},
+    RemoveNameTag = {}
+}
 
 GuiLibrary:CreateModule("Blatant", "Invisibility", function(callback)
     if callback then
@@ -39,10 +42,27 @@ GuiLibrary:CreateModule("Blatant", "Invisibility", function(callback)
         if lplr.Character then
             charAdded(lplr.Character)
         end
-        invisibilityConnections.characterAdded = lplr.CharacterAdded:Connect(charAdded)
+        connections.Invisibility.characterAdded = lplr.CharacterAdded:Connect(charAdded)
     else
-        for _, connection in pairs(invisibilityConnections) do
-            print("E")
+        for _, connection in pairs(connections.Invisibility) do
+            if typeof(connection) == "RBXScriptConnection" then
+                connection:Disconnect()
+            end
+        end
+    end
+end)
+
+GuiLibrary:CreateModule("Utility", "RemoveNameTag", function(callback)
+    if callback then
+        local function charAdded(character)
+            character:WaitForChild("Head"):WaitForChild("NametagBillboard"):Destroy()
+        end
+        if lplr.Character then
+            charAdded(lplr.Character)
+        end
+        connections.RemoveNameTag.characterAdded = lplr.CharacterAdded:Connect(charAdded)
+    else
+        for _, connection in pairs(connections.RemoveNameTag) do
             if typeof(connection) == "RBXScriptConnection" then
                 connection:Disconnect()
             end
