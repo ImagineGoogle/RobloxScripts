@@ -3,7 +3,8 @@ repeat task.wait() until game:IsLoaded()
 local queueTeleport = syn and syn.queue_on_teleport or queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
 queueTeleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/TelanthricBedWars.lua", true))()')
 
-local lplr = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local lplr = Players.LocalPlayer
 
 local GuiLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/CapeForRobloxBedwars/main/GuiLibrary.lua"), true)()
 
@@ -14,6 +15,47 @@ GuiLibrary.CreateWindow("Blatant")
 GuiLibrary.CreateWindow("Render")
 GuiLibrary.CreateWindow("Utility")
 GuiLibrary.CreateWindow("World")
+
+local staff = {
+    Moderators = {
+        1931871874,
+        44059064,
+        72384463,
+        1331206578,
+        1874945531,
+        1806776213
+    },
+    Testers = {
+        607493773,
+        633300085
+    }
+}
+
+local function createNotif(title, text)
+    game:GetService("StarterGui"):SetCore("SendNotification",{
+        Title = title,
+        Text = text
+    })
+end
+
+--// staff detector
+do
+    local function checkStaff(id)
+        if table.find(staff.Moderators, id) then
+            createNotif("Moderator Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
+        elseif table.find(staff.Testers, id) then
+            createNotif("Tester Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
+        end
+    end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        checkStaff(player.UserId)
+    end
+    Players.PlayerAdded:Connect(function(player)
+        checkStaff(player.UserId)
+    end)
+end
+
 
 local function isAlive()
     if lplr and lplr.Character then
