@@ -114,6 +114,20 @@ GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
     end
 end)
 
+GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
+    if callback then
+        local beds = workspace.Beds
+        local teamBed = beds["bed_" .. lplr.Team.Name:lower()]
+        for _, bed in pairs(beds:GetChildren()) do
+            if bed ~= teamBed then
+                if isAlive() then
+                    lplr.Character.HumanoidRootPart.CFrame = bed.bed.CFrame + Vector3.new(0, 5, 0)
+                end
+            end
+        end
+    end
+end)
+
 GuiLibrary.CreateModule("Utility", "RemoveNameTag", function(callback)
     if callback then
         local function charAdded(character)
