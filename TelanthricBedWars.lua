@@ -118,11 +118,14 @@ GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
     if callback then
         local beds = workspace.Beds
         local teamBed = beds["bed_" .. lplr.Team.Name:lower()]
-        for _, bed in pairs(beds:GetChildren()) do
-            if bed ~= teamBed then
+        
+        for _, team in pairs(game:GetService("Teams"):GetTeams()) do
+            if #team:GetPlayers() ~= 0 and team ~= lplr.Team then
+                local bed = beds["bed_" .. team.Name:lower()]
                 if isAlive() then
                     lplr.Character.HumanoidRootPart.CFrame = bed.bed.CFrame + Vector3.new(0, 5, 0)
                 end
+                break
             end
         end
     end
