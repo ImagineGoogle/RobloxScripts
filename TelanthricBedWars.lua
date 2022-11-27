@@ -7,20 +7,20 @@ local lplr = game:GetService("Players").LocalPlayer
 
 local GuiLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/CapeForRobloxBedwars/main/GuiLibrary.lua"), true)()
 
-GuiLibrary:CreateMainGui()
+GuiLibrary.CreateMainGui()
 
-GuiLibrary:CreateWindow("Combat")
-GuiLibrary:CreateWindow("Blatant")
-GuiLibrary:CreateWindow("Render")
-GuiLibrary:CreateWindow("Utility")
-GuiLibrary:CreateWindow("World")
+GuiLibrary.CreateWindow("Combat")
+GuiLibrary.CreateWindow("Blatant")
+GuiLibrary.CreateWindow("Render")
+GuiLibrary.CreateWindow("Utility")
+GuiLibrary.CreateWindow("World")
 
 local connections = {
     Invisibility = {},
     RemoveNameTag = {}
 }
 
-GuiLibrary:CreateModule("Blatant", "Invisibility", function(callback)
+GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
     if callback then
         local function charAdded(character)
             local hrp = character:WaitForChild("HumanoidRootPart")
@@ -31,7 +31,7 @@ GuiLibrary:CreateModule("Blatant", "Invisibility", function(callback)
             if tag then
                 tag:Destroy()
             end
-
+            
             hrp.Parent = workspace
             character.PrimaryPart = hrp
             character:MoveTo(Vector3.new(old.X,9e9,old.Z))
@@ -52,7 +52,7 @@ GuiLibrary:CreateModule("Blatant", "Invisibility", function(callback)
     end
 end)
 
-GuiLibrary:CreateModule("Utility", "RemoveNameTag", function(callback)
+GuiLibrary.CreateModule("Utility", "RemoveNameTag", function(callback)
     if callback then
         local function charAdded(character)
             character:WaitForChild("Head"):WaitForChild("NametagBillboard"):Destroy()
@@ -69,3 +69,15 @@ GuiLibrary:CreateModule("Utility", "RemoveNameTag", function(callback)
         end
     end
 end)
+
+local args = {
+    [1] = {
+        [1] = {
+            [1] = "\22",
+            [2] = "\2100\152d\218\13I\254\173\160\221\212\179\22\209\188",
+            [3] = "OneVsOne"
+        }
+    }
+}
+
+game:GetService("ReplicatedStorage").RemoteEvent:FireServer(unpack(args))
