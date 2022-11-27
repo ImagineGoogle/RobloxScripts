@@ -26,7 +26,7 @@ GuiLibrary:CreateModule("Blatant", "Invisibility", function(callback)
         local function charAdded(character)
             local hrp = character:WaitForChild("HumanoidRootPart")
             local old = hrp.CFrame
-            task.wait(0.3)
+            task.wait(1)
 
             local tag = hrp:FindFirstChildOfClass("BillboardGui")
             if tag then
@@ -41,6 +41,9 @@ GuiLibrary:CreateModule("Blatant", "Invisibility", function(callback)
             task.wait(0.5)
             newroot.Parent = hrp
             hrp.CFrame = old
+        end
+        if lplr.Character then
+            charAdded(lplr.Character)
         end
         invisibilityConnections.characterAdded = lplr.CharacterAdded:Connect(charAdded)
     else
