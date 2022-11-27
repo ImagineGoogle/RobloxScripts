@@ -39,32 +39,28 @@ local staff = {
     }
 }
 
-local function createNotif(title, text)
+local function createStaffNotif(title, text)
+    local bindableFunction = Instance.new("BindableFunction")
+    bindableFunction.OnInvoke = function()
+        game:GetService("TeleportService"):TeleportAsync(10255454029, {lplr})
+    end
+
     game:GetService("StarterGui"):SetCore("SendNotification",{
         Title = title,
         Text = text,
-        Duration = 8
+        Duration = 8,
+        Button1 = "Lobby",
+        Callback = bindableFunction
     })
 end
 
---// staff detector
-do
-    local function checkStaff(id)
-        if table.find(staff.Moderators, id) then
-            createNotif("Moderator Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
-        elseif table.find(staff.Testers, id) then
-            createNotif("Tester Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
-        end
+local function checkStaff(id)
+    if table.find(staff.Moderators, id) then
+        createStaffNotif("Moderator Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
+    elseif table.find(staff.Testers, id) then
+        createStaffNotif("Tester Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
     end
-
-    for _, player in ipairs(Players:GetPlayers()) do
-        checkStaff(player.UserId)
-    end
-    Players.PlayerAdded:Connect(function(player)
-        checkStaff(player.UserId)
-    end)
 end
-
 
 local function isAlive()
     if lplr and lplr.Character then
@@ -79,7 +75,8 @@ end
 
 local connections = {
     Invisibility = {},
-    RemoveNameTag = {}
+    RemoveNameTag = {},
+    StaffDetector = {}
 }
 
 GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
@@ -162,6 +159,23 @@ GuiLibrary.CreateModule("Utility", "GetEmeralds", function(callback)
                 end
             end
             lplr.Character.HumanoidRootPart.CFrame = oldCFrame
+        end
+    end
+end)
+
+GuiLibrary.CreateModule("Utility", "StaffDetector", function(callback)
+    if callback then
+        for _, player in ipairs(Players:GetPlayers()) do
+            checkStaff(player.UserId)
+        end
+        connections.StaffDetector.PlayerAdded = Players.PlayerAdded:Connect(function(player)
+            checkStaff(player.UserId)
+        end)
+    else
+        for _, connection in pairs(connections.StaffDetector) do
+            if typeof(connection) == "RBXScriptConnection" then
+                connection:Disconnect()
+            end
         end
     end
 end)
