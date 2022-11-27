@@ -90,7 +90,7 @@ GuiLibrary.CreateModule("Utility", "GetEmeralds", function(callback)
             for _, emerald in pairs(emeralds:GetChildren()) do
                 if isAlive() then
                     lplr.Character.HumanoidRootPart.CFrame = emerald.DropBox.CFrame
-                    task.wait(0.1)
+                    task.wait(0.4)
                 end
             end
             lplr.Character.HumanoidRootPart.CFrame = oldCFrame
