@@ -114,7 +114,6 @@ end)
 GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
     if callback then
         local beds = workspace.Beds
-        local teamBed = beds["bed_" .. lplr.Team.Name:lower()]
         
         for _, team in pairs(game:GetService("Teams"):GetTeams()) do
             if #team:GetPlayers() ~= 0 and team ~= lplr.Team then
@@ -159,6 +158,20 @@ GuiLibrary.CreateModule("Utility", "GetEmeralds", function(callback)
                 end
             end
             lplr.Character.HumanoidRootPart.CFrame = oldCFrame
+        end
+    end
+end)
+
+GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
+    if not isAlive() then return end
+    local drops = workspace:FindFirstChild("Drops")
+    if drops then
+        for _, drop in pairs(drops:GetDescendants()) do
+            if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
+                if isAlive() then
+                    drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame
+                end
+            end
         end
     end
 end)
