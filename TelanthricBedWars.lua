@@ -245,6 +245,28 @@ if game.PlaceId ~= 10255454029 then --// game only modules
             _G.KillAura = false
         end
     end)
+    local speedCharAdded
+    local speedChanged
+    local speedCooldown = false
+    Speed = GuiLibrary.CreateModule("Blatant", "Speed", function(callback)
+        if callback then
+            _G.Speed = true
+            while true do
+                task.wait()
+                if _G.Speed == false then
+                    break
+                end
+                if isAlive() then
+                    lplr.Character.Humanoid.WalkSpeed = 35
+                end
+            end
+        else
+            _G.Speed = false
+            if isAlive() then
+                lplr.Character.Humanoid.WalkSpeed = 16
+            end
+        end
+    end)
     CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
         if callback then
             for _, drop in pairs(workspace.Drops:GetDescendants()) do
@@ -314,30 +336,6 @@ LowGravity = GuiLibrary.CreateModule("Blatant", "LowGravity", function(callback)
         workspace.Gravity = 50
     else
         workspace.Gravity = 196.2
-    end
-end)
-
-local speedCharAdded
-local speedChanged
-local speedCooldown = false
-
-Speed = GuiLibrary.CreateModule("Blatant", "Speed", function(callback)
-    if callback then
-        _G.Speed = true
-        while true do
-            task.wait()
-            if _G.Speed == false then
-                break
-            end
-            if isAlive() then
-                lplr.Character.Humanoid.WalkSpeed = 35
-            end
-        end
-    else
-        _G.Speed = false
-        if isAlive() then
-            lplr.Character.Humanoid.WalkSpeed = 16
-        end
     end
 end)
 
