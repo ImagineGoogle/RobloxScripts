@@ -189,7 +189,7 @@ end)
 
 CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
     if callback then
-        for _, drop in pairs(drops:GetDescendants()) do
+        for _, drop in pairs(workspace.Drops:GetDescendants()) do
             if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
                 if isAlive() then
                     drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
