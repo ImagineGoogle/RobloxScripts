@@ -37,8 +37,12 @@ local staff = {
 
 local function createStaffNotif(title, text)
     local bindableFunction = Instance.new("BindableFunction")
-    bindableFunction.OnInvoke = function()
-        game:GetService("TeleportService"):Teleport(10255454029, lplr)
+    bindableFunction.OnInvoke = function(buttonPressed)
+        if buttonPressed == "Lobby" then
+            game:GetService("TeleportService"):Teleport(10255454029, lplr)
+        elseif buttonPressed == "Panic" then
+            GuiLibrary.Panic()
+        end
     end
 
     game:GetService("StarterGui"):SetCore("SendNotification",{
@@ -46,6 +50,7 @@ local function createStaffNotif(title, text)
         Text = text,
         Duration = 8,
         Button1 = "Lobby",
+        Button2 = "Panic",
         Callback = bindableFunction
     })
 end
@@ -96,51 +101,101 @@ local function getBedByTeamColour(teamColour)
     end
 end
 
-Invisibility = GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
-    if callback then
-        local function charAdded(character)
-            local hrp = character:WaitForChild("HumanoidRootPart")
-            local old = hrp.CFrame
-            task.wait(1)
+if game.PlaceId ~= 10255454029 then -- game only modules
+    Invisibility = GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
+        if callback then
+            local function charAdded(character)
+                local hrp = character:WaitForChild("HumanoidRootPart")
+                local old = hrp.CFrame
+                task.wait(1)
 
-            local tag = hrp:FindFirstChildOfClass("BillboardGui")
-            if tag then
-                print'tag found (invis)'
-                tag:Destroy()
-            end
-            
-            hrp.Parent = workspace
-            character.PrimaryPart = hrp
-            character:MoveTo(Vector3.new(old.X,9e9,old.Z))
-            hrp.Parent = character
-            task.wait(0.5)
-            hrp.CFrame = old
-        end
-        if lplr.Character then
-            charAdded(lplr.Character)
-        end
-        charAddedConnection = lplr.CharacterAdded:Connect(charAdded)
-    else
-        charAddedConnection:Disconnect()
-    end
-end)
-
-BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
-    if callback then 
-        for _, team in pairs(game:GetService("Teams"):GetTeams()) do
-            if #team:GetPlayers() ~= 0 and team ~= lplr.Team then
-                local bed = getBedByTeamColour(team.TeamColor)
-                if bed and isAlive() then
-                    lplr.Character.HumanoidRootPart.CFrame = bed.bed.ColorPart.CFrame + Vector3.new(0, 5, 0)
+                local tag = hrp:FindFirstChildOfClass("BillboardGui")
+                if tag then
+                    print'tag found (invis)'
+                    tag:Destroy()
                 end
-                BedTP.Toggle(false)
-                break
+                
+                hrp.Parent = workspace
+                character.PrimaryPart = hrp
+                character:MoveTo(Vector3.new(old.X,9e9,old.Z))
+                hrp.Parent = character
+                task.wait(0.5)
+                hrp.CFrame = old
+            end
+            if lplr.Character then
+                charAdded(lplr.Character)
+            end
+            charAddedConnection = lplr.CharacterAdded:Connect(charAdded)
+        else
+            charAddedConnection:Disconnect()
+        end
+    end)
+    BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
+        if callback then 
+            for _, team in pairs(game:GetService("Teams"):GetTeams()) do
+                if #team:GetPlayers() ~= 0 and team ~= lplr.Team then
+                    local bed = getBedByTeamColour(team.TeamColor)
+                    if bed and isAlive() then
+                        lplr.Character.HumanoidRootPart.CFrame = bed.bed.ColorPart.CFrame + Vector3.new(0, 5, 0)
+                    end
+                    BedTP.Toggle(false)
+                    break
+                end
+            end
+            task.wait(0.5)
+            BedTP.Toggle(false)
+        end
+    end)
+    CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
+        if callback then
+            for _, drop in pairs(workspace.Drops:GetDescendants()) do
+                if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
+                    if isAlive() then
+                        drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0)
+                        CollectAllDrops.Toggle(false)
+                    end
+                end
+            end
+            task.wait(0.5)
+            CollectAllDrops.Toggle(false)
+        end
+    end)
+    TPToEmeralds = GuiLibrary.CreateModule("Utility", "TPToEmeralds", function(callback)
+        if callback then
+            TPToEmeralds.Toggle(false)
+            if isAlive() then
+                local emeralds = workspace.Drops:FindFirstChild("emerald")
+                if emeralds then
+                    local oldCFrame = lplr.Character.HumanoidRootPart.CFrame
+                    for _, emerald in pairs(emeralds:GetChildren()) do
+                        if isAlive() then
+                            lplr.Character.HumanoidRootPart.CFrame = emerald.DropBox.CFrame
+                            task.wait(0.4)
+                        end
+                    end
+                    lplr.Character.HumanoidRootPart.CFrame = oldCFrame
+                end
             end
         end
-        task.wait(0.5)
-        BedTP.Toggle(false)
-    end
-end)
+    end)
+    RemoveNameTag = GuiLibrary.CreateModule("Utility", "RemoveNameTag", function(callback)
+        if callback then
+            local function charAdded(character)
+                local head = character:WaitForChild("Head")
+                local nametag = head:FindFirstChildOfClass("BillboardGui")
+                if nametag then
+                    nametag:Destroy()
+                end
+            end
+            if lplr.Character then
+                charAdded(lplr.Character)
+            end
+            charAddedConnection = lplr.CharacterAdded:Connect(charAdded)
+        else
+            charAddedConnection:Disconnect()
+        end
+    end)
+end
 
 LongJump = GuiLibrary.CreateModule("Blatant", "LongJump", function(callback)
     if callback then
@@ -150,58 +205,6 @@ LongJump = GuiLibrary.CreateModule("Blatant", "LongJump", function(callback)
         end
         task.wait(0.4)
         LongJump.Toggle(false)
-    end
-end)
-
-RemoveNameTag = GuiLibrary.CreateModule("Utility", "RemoveNameTag", function(callback)
-    if callback then
-        local function charAdded(character)
-            local head = character:WaitForChild("Head")
-            local nametag = head:FindFirstChildOfClass("BillboardGui")
-            if nametag then
-                nametag:Destroy()
-            end
-        end
-        if lplr.Character then
-            charAdded(lplr.Character)
-        end
-        charAddedConnection = lplr.CharacterAdded:Connect(charAdded)
-    else
-        charAddedConnection:Disconnect()
-    end
-end)
-
-TPToEmeralds = GuiLibrary.CreateModule("Utility", "TPToEmeralds", function(callback)
-    if callback then
-        TPToEmeralds.Toggle(false)
-        if isAlive() then
-            local emeralds = workspace.Drops:FindFirstChild("emerald")
-            if emeralds then
-                local oldCFrame = lplr.Character.HumanoidRootPart.CFrame
-                for _, emerald in pairs(emeralds:GetChildren()) do
-                    if isAlive() then
-                        lplr.Character.HumanoidRootPart.CFrame = emerald.DropBox.CFrame
-                        task.wait(0.4)
-                    end
-                end
-                lplr.Character.HumanoidRootPart.CFrame = oldCFrame
-            end
-        end
-    end
-end)
-
-CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
-    if callback then
-        for _, drop in pairs(workspace.Drops:GetDescendants()) do
-            if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
-                if isAlive() then
-                    drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0)
-                    CollectAllDrops.Toggle(false)
-                end
-            end
-        end
-        task.wait(0.5)
-        CollectAllDrops.Toggle(false)
     end
 end)
 
