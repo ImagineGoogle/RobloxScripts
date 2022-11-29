@@ -238,7 +238,7 @@ AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
             print(messageObj)
             if messageObj.FromSpeaker ~= lplr.Name then
                 local msg = messageObj.Message
-                chatEventsFolder.SayMessageRequest:FireServer("\"" .. msg .. "\" -🤓", "All")
+                chatEventsFolder.SayMessageRequest:FireServer('"' .. msg .. '" -🤓', "All")
             end
         end)
     else
