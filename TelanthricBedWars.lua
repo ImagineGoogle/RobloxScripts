@@ -257,7 +257,7 @@ if game.PlaceId ~= 10255454029 then --// game only modules
                     break
                 end
                 if isAlive() then
-                    lplr.Character.Humanoid.WalkSpeed = 35
+                    lplr.Character.Humanoid.WalkSpeed = 40
                 end
             end
         else
