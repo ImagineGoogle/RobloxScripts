@@ -129,7 +129,9 @@ if game.PlaceId ~= 10255454029 then --// game only modules
             end
             charAddedConnectionInvisibility = lplr.CharacterAdded:Connect(charAdded)
         else
-            charAddedConnectionInvisibility:Disconnect()
+            if charAddedConnectionInvisibility then
+                charAddedConnectionInvisibility:Disconnect()
+            end
         end
     end)
     BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
@@ -194,7 +196,9 @@ if game.PlaceId ~= 10255454029 then --// game only modules
             end
             charAddedConnectionNameTag = lplr.CharacterAdded:Connect(charAdded)
         else
-            charAddedConnectionNameTag:Disconnect()
+            if charAddedConnectionNameTag then
+                charAddedConnectionNameTag:Disconnect()
+            end
         end
     end)
 end
@@ -237,6 +241,8 @@ AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
             end
         end)
     else
-        chattedConnection:Disconnect()
+        if chattedConnection then
+            chattedConnection:Disconnect()
+        end
     end
 end)
