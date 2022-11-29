@@ -102,6 +102,8 @@ local function getBedByTeamColour(teamColour)
 end
 
 if game.PlaceId ~= 10255454029 then --// game only modules
+    local charAddedConnectionInvisibility
+    local charAddedConnectionNameTag
 
     Invisibility = GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
         if callback then
@@ -125,10 +127,10 @@ if game.PlaceId ~= 10255454029 then --// game only modules
             if lplr.Character then
                 charAdded(lplr.Character)
             end
-            charAddedConnection = lplr.CharacterAdded:Connect(charAdded)
+            charAddedConnectionInvisibility = lplr.CharacterAdded:Connect(charAdded)
         else
-            if charAddedConnection then
-                charAddedConnection:Disconnect()
+            if charAddedConnectionInvisibility then
+                charAddedConnectionInvisibility:Disconnect()
             end
         end
     end)
@@ -192,9 +194,9 @@ if game.PlaceId ~= 10255454029 then --// game only modules
             if lplr.Character then
                 charAdded(lplr.Character)
             end
-            charAddedConnection = lplr.CharacterAdded:Connect(charAdded)
+            charAddedConnectionNameTag = lplr.CharacterAdded:Connect(charAdded)
         else
-            charAddedConnection:Disconnect()
+            charAddedConnectionNameTag:Disconnect()
         end
     end)
 end
