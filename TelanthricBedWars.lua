@@ -105,6 +105,7 @@ Invisibility = GuiLibrary.CreateModule("Blatant", "Invisibility", function(callb
 
             local tag = hrp:FindFirstChildOfClass("BillboardGui")
             if tag then
+                print'tag found (invis)'
                 tag:Destroy()
             end
             
