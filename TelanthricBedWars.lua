@@ -117,8 +117,6 @@ local function getNearestPlayer()
     end
 end
 
-local instantKillEnabled = false
-
 if game.PlaceId ~= 10255454029 then --// game only modules
     local charAddedConnectionInvisibility
     local charAddedConnectionNameTag
@@ -168,13 +166,6 @@ if game.PlaceId ~= 10255454029 then --// game only modules
             BedTP.Toggle(false)
         end
     end)
-    InstantKill = GuiLibrary.CreateModule("Blatant", "InstantKill", function(callback)
-        if callback then
-            instantKillEnabled = true
-        else
-            instantKillEnabled = false
-        end
-    end)
     KillAura = GuiLibrary.CreateModule("Blatant", "KillAura", function(callback)
         if callback then
             _G.KillAura = true
@@ -182,17 +173,10 @@ if game.PlaceId ~= 10255454029 then --// game only modules
                 if not _G.KillAura then
                     break
                 end
-                if not instantKillEnabled then
-                    task.wait(0.5)
-                else
-                    task.wait()
-                end
+                task.wait()
                 if not isAlive() then continue end
                 
-                local nearestPlayer
-                if not instantKillEnabled then
-                    nearestPlayer = getNearestPlayer()
-                end
+                local nearestPlayer = getNearestPlayer()
 
                 local swordName
                 for i, v in pairs(workspace[lplr.Name]:GetChildren()) do
@@ -330,6 +314,39 @@ LowGravity = GuiLibrary.CreateModule("Blatant", "LowGravity", function(callback)
         workspace.Gravity = 50
     else
         workspace.Gravity = 196.2
+    end
+end)
+
+local speedCharAdded
+local speedChanged
+local speedCooldown = false
+
+Speed = GuiLibrary.CreateModule("Blatant", "Speed", function(callback)
+    if callback then
+        local function charAdded(character)
+            if speedCooldown == false then
+                speedCooldown = true
+                speedChanged = character:WaitForChild("Humanoid"):GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+                    character.Humanoid.WalkSpeed = character.Humanoid.WalkSpeed * 3
+                end)
+                task.wait(0.1)
+                speedCooldown = false
+            end
+        end
+        if lplr.Character then
+            charAdded(lplr.Character)
+        end
+        speedCharAdded = lplr.CharacterAdded:Connect(charAdded)
+    else
+        if speedCharAdded then
+            speedCharAdded:Disconnect()
+        end
+        if speedChanged then
+            speedChanged:Disconnect()
+        end
+        if isAlive() then
+            lplr.Character.Humanoid.WalkSpeed = 16
+        end
     end
 end)
 
