@@ -325,6 +325,7 @@ Speed = GuiLibrary.CreateModule("Blatant", "Speed", function(callback)
     if callback then
         _G.Speed = true
         while true do
+            task.wait()
             if _G.Speed == false then
                 break
             end
