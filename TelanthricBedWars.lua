@@ -3,7 +3,7 @@ repeat task.wait() until game:IsLoaded()
 local queueTeleport = syn and syn.queue_on_teleport or queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
 queueTeleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/TelanthricBedWars.lua", true))()')
 
-local GroupService = game:GetService("GroupService")
+local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
 local lplr = Players.LocalPlayer
@@ -94,22 +94,6 @@ local function getBedByTeamColour(teamColour)
             end
         end
     end
-end
-
-local dropLoop = false
-
-while dropLoop == true do
-    if isAlive() then
-        local drops = workspace:FindFirstChild("Drops")
-        if drops then
-            for _, drop in pairs(drops:GetDescendants()) do
-                if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
-                    drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame
-                end
-            end
-        end
-    end
-    task.wait(0.05)
 end
 
 Invisibility = GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
@@ -206,9 +190,18 @@ end)
 
 CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
     if callback then
-        dropLoop = true
+        RunService:BindToRenderStep("CollectAllDrops", Enum.RenderPriority.Last, function()
+            local drops = workspace:FindFirstChild("Drops")
+            if drops then
+                for _, drop in pairs(drops:GetDescendants()) do
+                    if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
+                        drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame
+                    end
+                end
+            end
+        end)
     else
-        dropLoop = false
+        RunService:UnbindFromRenderStep("CollectAllDrops")
     end
 end)
 
