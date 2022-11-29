@@ -101,6 +101,24 @@ local function getBedByTeamColour(teamColour)
     end
 end
 
+local function getNearestPlayer()
+    local nearestPlayer, nearestDistance
+	for _, player in pairs(Players:GetPlayers()) do
+		local character = player.Character
+		local distance = player:DistanceFromCharacter(lplr.Character.Head.Position)
+		if not character or (nearestDistance and distance >= nearestDistance) or player == lplr then
+            continue
+		end
+		nearestDistance = distance
+		nearestPlayer = player
+	end
+    if nearestPlayer then
+        return nearestPlayer
+    end
+end
+
+local instantKillEnabled = false
+
 if game.PlaceId ~= 10255454029 then --// game only modules
     local charAddedConnectionInvisibility
     local charAddedConnectionNameTag
@@ -148,6 +166,89 @@ if game.PlaceId ~= 10255454029 then --// game only modules
             end
             task.wait(0.5)
             BedTP.Toggle(false)
+        end
+    end)
+    InstantKill = GuiLibrary.CreateModule("Blatant", "InstantKill", function(callback)
+        if callback then
+            instantKillEnabled = true
+        else
+            instantKillEnabled = false
+        end
+    end)
+    KillAura = GuiLibrary.CreateModule("Blatant", "KillAura", function(callback)
+        if callback then
+            _G.KillAura = true
+            while true do
+                if not _G.KillAura then
+                    break
+                end
+                if not instantKillEnabled then
+                    task.wait(0.5)
+                else
+                    task.wait()
+                end
+                if not isAlive() then continue end
+
+                local nearestPlayer = getNearestPlayer()
+
+                local swordName
+                for i, v in pairs(workspace[lplr.Name]:GetChildren()) do
+                    if string.find(v.Name, "_sword") then
+                        swordName = v.Name
+                    end
+                end
+
+                if not swordName then continue end
+
+                local argsTable = {
+                    [1] = {
+                        [1] = {
+                            [1] = "\18",
+                            [2] = swordName,
+                            [3] = nil,
+                            [4] = nearestPlayer.Character.HumanoidRootPart.Position,
+                            [5] = {
+                                [1] = nil,
+                                [2] = nil,
+                                [3] = nil,
+                                [4] = nil,
+                                [5] = nil,
+                                [6] = nil,
+                                [7] = nil,
+                                [8] = nil,
+                                [9] = nil,
+                                [10] = nil,
+                                [11] = nil,
+                                [12] = lplr.Character.LeftLowerLeg,
+                                [13] = lplr.Character.LeftFoot,
+                                [14] = lplr.Character.RightFoot,
+                                [15] = lplr.Character.RightLowerLeg,
+                                [16] = lplr.Character.RightUpperLeg,
+                                [17] = lplr.Character.LeftUpperLeg,
+                                [18] = lplr.Characterr.LeftHand,
+                                [19] = lplr.Characterr.LeftLowerArm,
+                                [20] = lplr.Characterr.LowerTorso,
+                                [21] = lplr.Characterr.HumanoidRootPart,
+                                [22] = lplr.Characterr.UpperTorso,
+                                [23] = lplr.Characterr.RightLowerArm,
+                                [24] = lplr.Characterr[swordName].Handle,
+                                [25] = lplr.Characterr[swordName].SwordPart,
+                                [26] = lplr.Characterr.RightUpperArm,
+                                [27] = lplr.Characterr.LeftUpperArm,
+                                [28] = nil,
+                                [29] = lplr.Characterr.RightHand,
+                                [30] = lplr.Characterr[swordName].SwordPart,
+                                [31] = lplr.Characterr[swordName].SwordPart,
+                                [32] = lplr.Characterr.Head
+                            }
+                        }
+                    }
+                }
+
+               ReplicatedStorage.RemoteEvent:FireServer(unpack(argsTable))
+            end
+        else
+            _G.KillAura = false
         end
     end)
     CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
@@ -243,7 +344,6 @@ AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
     if callback then
         local chatEventsFolder = ReplicatedStorage:WaitForChild("DefaultChatSystemChatEvents")
         chatEventsFolder.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageObj)
-            print(messageObj)
             if messageObj.FromSpeaker ~= lplr.Name then
                 local msg = messageObj.Message
                 chatEventsFolder.SayMessageRequest:FireServer('"' .. msg .. '" -🤓', "All")
