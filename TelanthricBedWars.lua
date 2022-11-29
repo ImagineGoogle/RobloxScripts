@@ -29,7 +29,9 @@ local staff = {
         1663033062,
         3905268304,
         3101357928,
-        1129645697
+        1129645697,
+        102885721,
+        1668757721
     }
 }
 
@@ -80,6 +82,20 @@ local function isAlive()
     end
 end
 
+local function getBedByTeamColour(teamColour)
+    local placedItems = workspace:FindFirstChild("PlacedItems")
+    if not placedItems then return end
+
+    for _, item in pairs(placedItems) do
+        if item:IsA("Model") and item.Name == "bed" then
+            local bedColour = bed.bed.ColorPart.BrickColor
+            if bedColour == teamColour then
+                return item
+            end
+        end
+    end
+end
+
 local dropLoop = false
 
 while dropLoop == true do
@@ -93,10 +109,10 @@ while dropLoop == true do
             end
         end
     end
-    task.wait(0.1)
+    task.wait(0.05)
 end
 
-GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
+Invisibility = GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
     if callback then
         local function charAdded(character)
             local hrp = character:WaitForChild("HumanoidRootPart")
@@ -124,23 +140,16 @@ GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
     end
 end)
 
-GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
+BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
     if callback then
         local placedItems = workspace.PlacedItems
         
         for _, team in pairs(game:GetService("Teams"):GetTeams()) do
             if #team:GetPlayers() ~= 0 and team ~= lplr.Team then
-                local bed
-                for _, item in pairs(placedItems) do
-                    if item:IsA("Model") and item.Name == "bed" then
-                        local teamColour = bed.bed.ColorPart.BrickColor
-                        if teamColour == team.TeamColor then
-                            bed = item
-                        end
-                    end
-                end
-                if isAlive() and bed then
+                local bed = getBedByTeamColour(team.TeamColor)
+                if bed and isAlive() then
                     lplr.Character.HumanoidRootPart.CFrame = bed.bed.ColorPart.CFrame + Vector3.new(0, 5, 0)
+                    BedTP.Toggle(false)
                 end
                 break
             end
@@ -148,7 +157,16 @@ GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
     end
 end)
 
-GuiLibrary.CreateModule("Utility", "RemoveNameTag", function(callback)
+LongJump = GuiLibrary.CreateModule("Blatant", "LongJump", function(callback)
+    if isAlive() then
+        local hrp = lplr.Character.HumanoidRootPart
+        hrp.AssemblyLinearVelocity += (hrp.CFrame.LookVector * 500) + Vector3.new(0, 60, 0)
+        task.wait(0.4)
+        LongJump.Toggle(false)
+    end
+end)
+
+RemoveNameTag = GuiLibrary.CreateModule("Utility", "RemoveNameTag", function(callback)
     if callback then
         local function charAdded(character)
             local head = character:WaitForChild("Head")
@@ -166,7 +184,7 @@ GuiLibrary.CreateModule("Utility", "RemoveNameTag", function(callback)
     end
 end)
 
-GuiLibrary.CreateModule("Utility", "TPToEmeralds", function(callback)
+TPToEmeralds = GuiLibrary.CreateModule("Utility", "TPToEmeralds", function(callback)
     if callback then
         if not isAlive() then return end
         local emeralds = workspace.Drops:FindFirstChild("emerald")
@@ -179,11 +197,12 @@ GuiLibrary.CreateModule("Utility", "TPToEmeralds", function(callback)
                 end
             end
             lplr.Character.HumanoidRootPart.CFrame = oldCFrame
+            TPToEmeralds.Toggle(false)
         end
     end
 end)
 
-GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
+CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
     if callback then
         dropLoop = true
     else
@@ -191,7 +210,7 @@ GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
     end
 end)
 
-GuiLibrary.CreateModule("Utility", "StaffDetector", function(callback)
+StaffDetector = GuiLibrary.CreateModule("Utility", "StaffDetector", function(callback)
     if callback then
         for _, player in ipairs(Players:GetPlayers()) do
             checkStaff(player.UserId)
