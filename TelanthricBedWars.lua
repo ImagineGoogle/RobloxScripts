@@ -101,7 +101,8 @@ local function getBedByTeamColour(teamColour)
     end
 end
 
-if game.PlaceId ~= 10255454029 then -- game only modules
+if game.PlaceId ~= 10255454029 then --// game only modules
+
     Invisibility = GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
         if callback then
             local function charAdded(character)
@@ -111,7 +112,6 @@ if game.PlaceId ~= 10255454029 then -- game only modules
 
                 local tag = hrp:FindFirstChildOfClass("BillboardGui")
                 if tag then
-                    print'tag found (invis)'
                     tag:Destroy()
                 end
                 
@@ -127,7 +127,9 @@ if game.PlaceId ~= 10255454029 then -- game only modules
             end
             charAddedConnection = lplr.CharacterAdded:Connect(charAdded)
         else
-            charAddedConnection:Disconnect()
+            if charAddedConnection then
+                charAddedConnection:Disconnect()
+            end
         end
     end)
     BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
@@ -208,6 +210,7 @@ LongJump = GuiLibrary.CreateModule("Blatant", "LongJump", function(callback)
     end
 end)
 
+local playerAddedConnection
 StaffDetector = GuiLibrary.CreateModule("Utility", "StaffDetector", function(callback)
     if callback then
         for _, player in ipairs(Players:GetPlayers()) do
@@ -217,6 +220,8 @@ StaffDetector = GuiLibrary.CreateModule("Utility", "StaffDetector", function(cal
             checkStaff(player.UserId)
         end)
     else
-        playerAddedConnection:Disconnect()
+        if playerAddedConnection then
+            playerAddedConnection:Disconnect()
+        end
     end
 end)
