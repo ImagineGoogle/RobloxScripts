@@ -83,12 +83,11 @@ end
 local dropLoop = false
 
 while dropLoop == true do
-    if not isAlive() then return end
-    local drops = workspace:FindFirstChild("Drops")
-    if drops then
-        for _, drop in pairs(drops:GetDescendants()) do
-            if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
-                if isAlive() then
+    if isAlive() then
+        local drops = workspace:FindFirstChild("Drops")
+        if drops then
+            for _, drop in pairs(drops:GetDescendants()) do
+                if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
                     drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame
                 end
             end
@@ -127,13 +126,21 @@ end)
 
 GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
     if callback then
-        local beds = workspace.Beds
+        local placedItems = workspace.PlacedItems
         
         for _, team in pairs(game:GetService("Teams"):GetTeams()) do
             if #team:GetPlayers() ~= 0 and team ~= lplr.Team then
-                local bed = beds["bed_" .. team.Name:lower()]
-                if isAlive() then
-                    lplr.Character.HumanoidRootPart.CFrame = bed.bed.CFrame + Vector3.new(0, 5, 0)
+                local bed
+                for _, item in pairs(placedItems) do
+                    if item:IsA("Model") and item.Name == "bed" then
+                        local teamColour = bed.bed.ColorPart.BrickColor
+                        if teamColour == team.TeamColor then
+                            bed = item
+                        end
+                    end
+                end
+                if isAlive() and bed then
+                    lplr.Character.HumanoidRootPart.CFrame = bed.bed.ColorPart.CFrame + Vector3.new(0, 5, 0)
                 end
                 break
             end
