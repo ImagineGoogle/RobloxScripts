@@ -86,7 +86,7 @@ local function getBedByTeamColour(teamColour)
     local placedItems = workspace:FindFirstChild("PlacedItems")
     if not placedItems then return end
 
-    for _, item in pairs(placedItems) do
+    for _, item in pairs(placedItems:GetDescendants()) do
         if item:IsA("Model") and item.Name == "bed" then
             local bedColour = bed.bed.ColorPart.BrickColor
             if bedColour == teamColour then
