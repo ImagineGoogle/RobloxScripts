@@ -159,6 +159,7 @@ end)
 
 LongJump = GuiLibrary.CreateModule("Blatant", "LongJump", function(callback)
     if isAlive() then
+        print'long jump on'
         local hrp = lplr.Character.HumanoidRootPart
         hrp.AssemblyLinearVelocity += (hrp.CFrame.LookVector * 100) + Vector3.new(0, 50, 0)
         task.wait(0.4)
