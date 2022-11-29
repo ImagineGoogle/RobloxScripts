@@ -214,6 +214,14 @@ LongJump = GuiLibrary.CreateModule("Blatant", "LongJump", function(callback)
     end
 end)
 
+LowGravity = GuiLibrary.CreateModule("Blatant", "LowGravity", function(callback)
+    if callback then
+        workspace.Gravity = 50
+    else
+        workspace.Gravity = 196.2
+    end
+end)
+
 local playerAddedConnectionStaff
 StaffDetector = GuiLibrary.CreateModule("Utility", "StaffDetector", function(callback)
     if callback then
