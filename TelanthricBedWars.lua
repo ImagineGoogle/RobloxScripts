@@ -88,7 +88,7 @@ local function getBedByTeamColour(teamColour)
 
     for _, item in pairs(placedItems:GetDescendants()) do
         if item:IsA("Model") and item.Name == "bed" then
-            local bedColour = bed.bed.ColorPart.BrickColor
+            local bedColour = item.bed.ColorPart.BrickColor
             if bedColour == teamColour then
                 return item
             end
@@ -190,7 +190,7 @@ end)
 
 CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
     if callback then
-        RunService:BindToRenderStep("CollectAllDrops", Enum.RenderPriority.Camera + 1, function()
+        RunService:BindToRenderStep("CollectAllDrops", 4, function()
             local drops = workspace:FindFirstChild("Drops")
             if drops then
                 for _, drop in pairs(drops:GetDescendants()) do
