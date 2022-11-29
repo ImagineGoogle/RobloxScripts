@@ -235,6 +235,7 @@ AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
     if callback then
         local chatEventsFolder = ReplicatedStorage:WaitForChild("DefaultChatSystemChatEvents")
         chatEventsFolder.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageObj)
+            print(messageObj)
             if messageObj.FromSpeaker ~= lplr.Name then
                 local msg = messageObj.Message
                 chatEventsFolder.SayMessageRequest:FireServer("\"" .. msg .. "\" -🤓", "All")
