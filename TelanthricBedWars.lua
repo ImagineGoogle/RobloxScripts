@@ -190,7 +190,7 @@ end)
 
 CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
     if callback then
-        RunService:BindToRenderStep("CollectAllDrops", Enum.RenderPriority.Last, function()
+        RunService:BindToRenderStep("CollectAllDrops", Enum.RenderPriority.Camera + 1, function()
             local drops = workspace:FindFirstChild("Drops")
             if drops then
                 for _, drop in pairs(drops:GetDescendants()) do
