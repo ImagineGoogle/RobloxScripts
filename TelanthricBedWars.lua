@@ -133,10 +133,11 @@ BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
                 if bed and isAlive() then
                     lplr.Character.HumanoidRootPart.CFrame = bed.bed.ColorPart.CFrame + Vector3.new(0, 5, 0)
                 end
+                BedTP.Toggle(false)
                 break
             end
         end
-        task.wait(1)
+        task.wait(0.5)
         BedTP.Toggle(false)
     end
 end)
@@ -195,10 +196,11 @@ CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function
             if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
                 if isAlive() then
                     drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0)
+                    CollectAllDrops.Toggle(false)
                 end
             end
         end
-        task.wait(1)
+        task.wait(0.5)
         CollectAllDrops.Toggle(false)
     end
 end)
