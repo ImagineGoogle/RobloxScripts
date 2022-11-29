@@ -34,7 +34,6 @@ local staff = {
         1668757721
     }
 }
-local chatEventsFolder = ReplicatedStorage.DefaultChatSystemChatEvents
 
 local function createStaffNotif(title, text)
     local bindableFunction = Instance.new("BindableFunction")
@@ -230,7 +229,8 @@ end)
 local chattedConnection
 AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
     if callback then
-       chatEventsFolder.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageObj)
+        local chatEventsFolder = ReplicatedStorage:WaitForChild("DefaultChatSystemChatEvents")
+        chatEventsFolder.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageObj)
             if messageObj.FromSpeaker ~= lplr.Name then
                 local msg = messageObj.Message
                 chatEventsFolder.SayMessageRequest:FireServer("\"" .. msg .. "\" -🤓", "All")
