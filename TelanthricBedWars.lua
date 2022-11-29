@@ -178,12 +178,12 @@ TPToEmeralds = GuiLibrary.CreateModule("Utility", "TPToEmeralds", function(callb
                 for _, emerald in pairs(emeralds:GetChildren()) do
                     if isAlive() then
                         lplr.Character.HumanoidRootPart.CFrame = emerald.DropBox.CFrame
+                        task.wait(0.4)
                     end
                 end
                 lplr.Character.HumanoidRootPart.CFrame = oldCFrame
             end
         end
-        task.wait(0.4)
         TPToEmeralds.Toggle(false)
     end
 end)
