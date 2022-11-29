@@ -245,9 +245,6 @@ if game.PlaceId ~= 10255454029 then --// game only modules
             _G.KillAura = false
         end
     end)
-    local speedCharAdded
-    local speedChanged
-    local speedCooldown = false
     Speed = GuiLibrary.CreateModule("Blatant", "Speed", function(callback)
         if callback then
             _G.Speed = true
