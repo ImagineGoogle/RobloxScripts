@@ -125,19 +125,17 @@ Invisibility = GuiLibrary.CreateModule("Blatant", "Invisibility", function(callb
 end)
 
 BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
-    if callback then
-        local placedItems = workspace.PlacedItems
-        
+    if callback then      
         for _, team in pairs(game:GetService("Teams"):GetTeams()) do
             if #team:GetPlayers() ~= 0 and team ~= lplr.Team then
                 local bed = getBedByTeamColour(team.TeamColor)
                 if bed and isAlive() then
                     lplr.Character.HumanoidRootPart.CFrame = bed.bed.ColorPart.CFrame + Vector3.new(0, 5, 0)
-                    BedTP.Toggle(false)
                 end
                 break
             end
         end
+        BedTP.Toggle(false)
     end
 end)
 
@@ -195,7 +193,9 @@ CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function
             if drops then
                 for _, drop in pairs(drops:GetDescendants()) do
                     if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
-                        drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame
+                        if isAlive() then
+                            drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(math.random(0, 2), math.random(0, 2), math.random(0, 2))
+                        end
                     end
                 end
             end
