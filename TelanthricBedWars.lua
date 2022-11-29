@@ -126,8 +126,7 @@ Invisibility = GuiLibrary.CreateModule("Blatant", "Invisibility", function(callb
 end)
 
 BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
-    if callback then
-        BedTP.Toggle(false)    
+    if callback then 
         for _, team in pairs(game:GetService("Teams"):GetTeams()) do
             if #team:GetPlayers() ~= 0 and team ~= lplr.Team then
                 local bed = getBedByTeamColour(team.TeamColor)
@@ -137,6 +136,8 @@ BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
                 break
             end
         end
+        task.wait(1)
+        BedTP.Toggle(false)
     end
 end)
 
@@ -190,7 +191,6 @@ end)
 
 CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
     if callback then
-        CollectAllDrops.Toggle(false)
         for _, drop in pairs(workspace.Drops:GetDescendants()) do
             if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
                 if isAlive() then
@@ -198,6 +198,8 @@ CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function
                 end
             end
         end
+        task.wait(1)
+        CollectAllDrops.Toggle(false)
     end
 end)
 
