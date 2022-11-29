@@ -105,7 +105,7 @@ local function getNearestPlayer()
     local nearestPlayer, nearestDistance
 	for _, player in pairs(Players:GetPlayers()) do
 		local character = player.Character
-		local distance = player:DistanceFromCharacter(lplr.Character.Head.Position)
+		local distance = player:DistanceFromCharacter(lplr.Character:WaitForChild("Head", 20).Position)
 		if not character or (nearestDistance and distance >= nearestDistance) or player == lplr then
             continue
 		end
