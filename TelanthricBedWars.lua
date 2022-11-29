@@ -188,8 +188,11 @@ if game.PlaceId ~= 10255454029 then --// game only modules
                     task.wait()
                 end
                 if not isAlive() then continue end
-
-                local nearestPlayer = getNearestPlayer()
+                
+                local nearestPlayer
+                if not instantKillEnabled then
+                    nearestPlayer = getNearestPlayer()
+                end
 
                 local swordName
                 for i, v in pairs(workspace[lplr.Name]:GetChildren()) do
@@ -200,13 +203,20 @@ if game.PlaceId ~= 10255454029 then --// game only modules
 
                 if not swordName then continue end
 
+                local targetPos
+                if nearestPlayer then
+                    if nearestPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        targetPos = nearestPlayer.Character.HumanoidRootPart.Position
+                    end
+                end
+
                 local argsTable = {
                     [1] = {
                         [1] = {
                             [1] = "\18",
                             [2] = swordName,
                             [3] = nil,
-                            [4] = nearestPlayer.Character.HumanoidRootPart.Position,
+                            [4] = targetPos or Vector3.new(0, 0, 0),
                             [5] = {
                                 [1] = nil,
                                 [2] = nil,
