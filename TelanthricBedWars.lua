@@ -155,7 +155,7 @@ if game.PlaceId ~= 10255454029 then --// game only modules
     BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
         if callback then 
             for _, team in pairs(game:GetService("Teams"):GetTeams()) do
-                if #team:GetPlayers() ~= 0 and team ~= lplr.Team then
+                if team ~= lplr.Team then
                     local bed = getBedByTeamColour(team.TeamColor)
                     if bed and isAlive() then
                         lplr.Character.HumanoidRootPart.CFrame = bed.bed.ColorPart.CFrame + Vector3.new(0, 5, 0)
