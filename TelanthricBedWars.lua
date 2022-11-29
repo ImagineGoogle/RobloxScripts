@@ -170,38 +170,33 @@ end)
 
 TPToEmeralds = GuiLibrary.CreateModule("Utility", "TPToEmeralds", function(callback)
     if callback then
-        if not isAlive() then return end
-        local emeralds = workspace.Drops:FindFirstChild("emerald")
-        if emeralds then
-            local oldCFrame = lplr.Character.HumanoidRootPart.CFrame
-            for _, emerald in pairs(emeralds:GetChildren()) do
-                if isAlive() then
-                    lplr.Character.HumanoidRootPart.CFrame = emerald.DropBox.CFrame
-                    task.wait(0.4)
+        if isAlive() then
+            local emeralds = workspace.Drops:FindFirstChild("emerald")
+            if emeralds then
+                local oldCFrame = lplr.Character.HumanoidRootPart.CFrame
+                for _, emerald in pairs(emeralds:GetChildren()) do
+                    if isAlive() then
+                        lplr.Character.HumanoidRootPart.CFrame = emerald.DropBox.CFrame
+                    end
                 end
+                lplr.Character.HumanoidRootPart.CFrame = oldCFrame
             end
-            lplr.Character.HumanoidRootPart.CFrame = oldCFrame
-            TPToEmeralds.Toggle(false)
         end
+        task.wait(0.4)
+        TPToEmeralds.Toggle(false)
     end
 end)
 
 CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
     if callback then
-        RunService:BindToRenderStep("CollectAllDrops", 4, function()
-            local drops = workspace:FindFirstChild("Drops")
-            if drops then
-                for _, drop in pairs(drops:GetDescendants()) do
-                    if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
-                        if isAlive() then
-                            drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(math.random(0, 2), math.random(0, 2), math.random(0, 2))
-                        end
-                    end
+        for _, drop in pairs(drops:GetDescendants()) do
+            if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
+                if isAlive() then
+                    drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
                 end
             end
-        end)
-    else
-        RunService:UnbindFromRenderStep("CollectAllDrops")
+        end
+        CollectAllDrops.Toggle(false)
     end
 end)
 
