@@ -3,7 +3,9 @@ repeat task.wait() until game:IsLoaded()
 local queueTeleport = syn and syn.queue_on_teleport or queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
 queueTeleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/TelanthricBedWars.lua", true))()')
 
+local GroupService = game:GetService("GroupService")
 local Players = game:GetService("Players")
+
 local lplr = Players.LocalPlayer
 
 local GuiLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/CapeForRobloxBedwars/main/GuiLibrary.lua"), true)()
@@ -19,30 +21,22 @@ GuiLibrary.CreateWindow("World")
 local staff = {
     Moderators = {
         1931871874,
-        44059064,
         72384463,
         1331206578,
         1874945531,
         1806776213,
-        1391475335,
-        3449929636
-    },
-    Testers = {
-        607493773,
-        633300085,
-        1793561308,
-        645329460,
-        1607860875,
-        1767457861,
-        871051687,
-        1107750894
+        3449929636,
+        1663033062,
+        3905268304,
+        3101357928,
+        1129645697
     }
 }
 
 local function createStaffNotif(title, text)
     local bindableFunction = Instance.new("BindableFunction")
     bindableFunction.OnInvoke = function()
-        game:GetService("TeleportService"):TeleportAsync(10255454029, {lplr})
+        game:GetService("TeleportService"):Teleport(10255454029, lplr)
     end
 
     game:GetService("StarterGui"):SetCore("SendNotification",{
@@ -55,10 +49,23 @@ local function createStaffNotif(title, text)
 end
 
 local function checkStaff(id)
-    if table.find(staff.Moderators, id) then
+    local player = Players:GetPlayerByUserId(id)
+    local rank = player:GetRankInGroup(15022320)
+
+    if table.find(staff.Moderators, id) or rank == 167 or rank == 197 then
         createStaffNotif("Moderator Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
-    elseif table.find(staff.Testers, id) then
+    elseif rank == 10 then
         createStaffNotif("Tester Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
+    elseif rank == 137 then
+        createStaffNotif("YouTuber Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
+    elseif rank == 147 then
+        createStaffNotif("Investor Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
+    elseif rank == 157 then
+        createStaffNotif("Contributor Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
+    elseif rank == 254 then
+        createStaffNotif("Developer Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
+    elseif rank == 255 then
+        createStaffNotif("Owner Detected", Players:GetNameFromUserIdAsync(id) .. " is in your game")
     end
 end
 
@@ -73,11 +80,22 @@ local function isAlive()
     end
 end
 
-local connections = {
-    Invisibility = {},
-    RemoveNameTag = {},
-    StaffDetector = {}
-}
+local dropLoop = false
+
+while dropLoop == true do
+    if not isAlive() then return end
+    local drops = workspace:FindFirstChild("Drops")
+    if drops then
+        for _, drop in pairs(drops:GetDescendants()) do
+            if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
+                if isAlive() then
+                    drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame
+                end
+            end
+        end
+    end
+    task.wait(0.1)
+end
 
 GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
     if callback then
@@ -101,13 +119,9 @@ GuiLibrary.CreateModule("Blatant", "Invisibility", function(callback)
         if lplr.Character then
             charAdded(lplr.Character)
         end
-        connections.Invisibility.characterAdded = lplr.CharacterAdded:Connect(charAdded)
+        charAddedConnection = lplr.CharacterAdded:Connect(charAdded)
     else
-        for _, connection in pairs(connections.Invisibility) do
-            if typeof(connection) == "RBXScriptConnection" then
-                connection:Disconnect()
-            end
-        end
+        charAddedConnection:Disconnect()
     end
 end)
 
@@ -130,22 +144,22 @@ end)
 GuiLibrary.CreateModule("Utility", "RemoveNameTag", function(callback)
     if callback then
         local function charAdded(character)
-            character:WaitForChild("Head"):WaitForChild("NametagBillboard"):Destroy()
+            local head = character:WaitForChild("Head")
+            local nametag = head:FindFirstChildOfClass("BillboardGui")
+            if nametag then
+                nametag:Destroy()
+            end
         end
         if lplr.Character then
             charAdded(lplr.Character)
         end
-        connections.RemoveNameTag.characterAdded = lplr.CharacterAdded:Connect(charAdded)
+        charAddedConnection = lplr.CharacterAdded:Connect(charAdded)
     else
-        for _, connection in pairs(connections.RemoveNameTag) do
-            if typeof(connection) == "RBXScriptConnection" then
-                connection:Disconnect()
-            end
-        end
+        charAddedConnection:Disconnect()
     end
 end)
 
-GuiLibrary.CreateModule("Utility", "GetEmeralds", function(callback)
+GuiLibrary.CreateModule("Utility", "TPToEmeralds", function(callback)
     if callback then
         if not isAlive() then return end
         local emeralds = workspace.Drops:FindFirstChild("emerald")
@@ -163,16 +177,10 @@ GuiLibrary.CreateModule("Utility", "GetEmeralds", function(callback)
 end)
 
 GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
-    if not isAlive() then return end
-    local drops = workspace:FindFirstChild("Drops")
-    if drops then
-        for _, drop in pairs(drops:GetDescendants()) do
-            if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
-                if isAlive() then
-                    drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame
-                end
-            end
-        end
+    if callback then
+        dropLoop = true
+    else
+        dropLoop = false
     end
 end)
 
@@ -181,14 +189,10 @@ GuiLibrary.CreateModule("Utility", "StaffDetector", function(callback)
         for _, player in ipairs(Players:GetPlayers()) do
             checkStaff(player.UserId)
         end
-        connections.StaffDetector.PlayerAdded = Players.PlayerAdded:Connect(function(player)
+        playerAddedConnection = Players.PlayerAdded:Connect(function(player)
             checkStaff(player.UserId)
         end)
     else
-        for _, connection in pairs(connections.StaffDetector) do
-            if typeof(connection) == "RBXScriptConnection" then
-                connection:Disconnect()
-            end
-        end
+        playerAddedConnection:Disconnect()
     end
 end)
