@@ -3,7 +3,7 @@ repeat task.wait() until game:IsLoaded()
 local queueTeleport = syn and syn.queue_on_teleport or queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
 queueTeleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/TelanthricBedWars.lua", true))()')
 
-local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local lplr = Players.LocalPlayer
@@ -34,6 +34,7 @@ local staff = {
         1668757721
     }
 }
+local chatEventsFolder = ReplicatedStorage.DefaultChatSystemChatEvents
 
 local function createStaffNotif(title, text)
     local bindableFunction = Instance.new("BindableFunction")
@@ -129,9 +130,7 @@ if game.PlaceId ~= 10255454029 then --// game only modules
             end
             charAddedConnectionInvisibility = lplr.CharacterAdded:Connect(charAdded)
         else
-            if charAddedConnectionInvisibility then
-                charAddedConnectionInvisibility:Disconnect()
-            end
+            charAddedConnectionInvisibility:Disconnect()
         end
     end)
     BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
@@ -212,18 +211,30 @@ LongJump = GuiLibrary.CreateModule("Blatant", "LongJump", function(callback)
     end
 end)
 
-local playerAddedConnection
+local playerAddedConnectionStaff
 StaffDetector = GuiLibrary.CreateModule("Utility", "StaffDetector", function(callback)
     if callback then
         for _, player in ipairs(Players:GetPlayers()) do
             checkStaff(player.UserId)
         end
-        playerAddedConnection = Players.PlayerAdded:Connect(function(player)
+        playerAddedConnectionStaff = Players.PlayerAdded:Connect(function(player)
             checkStaff(player.UserId)
         end)
     else
-        if playerAddedConnection then
-            playerAddedConnection:Disconnect()
+        if playerAddedConnectionStaff then
+            playerAddedConnectionStaff:Disconnect()
         end
+    end
+end)
+
+local chattedConnection
+AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
+    if callback then
+       chatEventsFolder.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageObj)
+            local msg = messageObj.Message
+            chatEventsFolder.SayMessageRequest:FireServer("\"" .. messageObj .. "\" -🤓", "All")
+        end)
+    else
+        chattedConnection:Disconnect()
     end
 end)
