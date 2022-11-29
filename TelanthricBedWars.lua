@@ -126,7 +126,8 @@ Invisibility = GuiLibrary.CreateModule("Blatant", "Invisibility", function(callb
 end)
 
 BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
-    if callback then      
+    if callback then
+        BedTP.Toggle(false)    
         for _, team in pairs(game:GetService("Teams"):GetTeams()) do
             if #team:GetPlayers() ~= 0 and team ~= lplr.Team then
                 local bed = getBedByTeamColour(team.TeamColor)
@@ -136,7 +137,6 @@ BedTP = GuiLibrary.CreateModule("Blatant", "BedTP", function(callback)
                 break
             end
         end
-        BedTP.Toggle(false)
     end
 end)
 
@@ -171,6 +171,7 @@ end)
 
 TPToEmeralds = GuiLibrary.CreateModule("Utility", "TPToEmeralds", function(callback)
     if callback then
+        TPToEmeralds.Toggle(false)
         if isAlive() then
             local emeralds = workspace.Drops:FindFirstChild("emerald")
             if emeralds then
@@ -184,20 +185,19 @@ TPToEmeralds = GuiLibrary.CreateModule("Utility", "TPToEmeralds", function(callb
                 lplr.Character.HumanoidRootPart.CFrame = oldCFrame
             end
         end
-        TPToEmeralds.Toggle(false)
     end
 end)
 
 CollectAllDrops = GuiLibrary.CreateModule("Utility", "CollectAllDrops", function(callback)
     if callback then
+        CollectAllDrops.Toggle(false)
         for _, drop in pairs(workspace.Drops:GetDescendants()) do
             if drop:IsA("Model") and drop:FindFirstChild("DropBox") then
                 if isAlive() then
-                    drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+                    drop.DropBox.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0)
                 end
             end
         end
-        CollectAllDrops.Toggle(false)
     end
 end)
 
