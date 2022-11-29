@@ -231,8 +231,10 @@ local chattedConnection
 AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
     if callback then
        chatEventsFolder.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageObj)
-            local msg = messageObj.Message
-            chatEventsFolder.SayMessageRequest:FireServer("\"" .. messageObj .. "\" -🤓", "All")
+            if messageObj.FromSpeaker ~= lplr.Name then
+                local msg = messageObj.Message
+                chatEventsFolder.SayMessageRequest:FireServer("\"" .. msg .. "\" -🤓", "All")
+            end
         end)
     else
         chattedConnection:Disconnect()
