@@ -323,27 +323,17 @@ local speedCooldown = false
 
 Speed = GuiLibrary.CreateModule("Blatant", "Speed", function(callback)
     if callback then
-        local function charAdded(character)
-            if speedCooldown == false then
-                speedCooldown = true
-                speedChanged = character:WaitForChild("Humanoid"):GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-                    character.Humanoid.WalkSpeed = character.Humanoid.WalkSpeed * 3
-                end)
-                task.wait(0.1)
-                speedCooldown = false
+        _G.Speed = true
+        while true do
+            if _G.Speed == false then
+                break
+            end
+            if isAlive() then
+                lplr.Character.Humanoid.WalkSpeed = 35
             end
         end
-        if lplr.Character then
-            charAdded(lplr.Character)
-        end
-        speedCharAdded = lplr.CharacterAdded:Connect(charAdded)
     else
-        if speedCharAdded then
-            speedCharAdded:Disconnect()
-        end
-        if speedChanged then
-            speedChanged:Disconnect()
-        end
+        _G.Speed = false
         if isAlive() then
             lplr.Character.Humanoid.WalkSpeed = 16
         end
