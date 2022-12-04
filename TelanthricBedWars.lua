@@ -1,3 +1,8 @@
+--[[
+    A few small things were taken from https://github.com/7GrandDadPGN/VapeV4ForRoblox/blob/main/CustomModules/11640391378.lua
+    sorry!!!!111!
+]]
+
 repeat task.wait() until game:IsLoaded()
 
 print("Cape - Telanthric BedWars Version 8")
@@ -9,6 +14,8 @@ local ProximityPromptService = game:GetService("ProximityPromptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextChatService =  game:GetService("TextChatService")
 local Players = game:GetService("Players")
+
+local Multibox = require(ReplicatedStorage:WaitForChild("MultiboxFramework"))
 
 local lplr = Players.LocalPlayer
 
@@ -33,6 +40,20 @@ do --// autonerd functionality
 
         TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync('"' .. msg .. '" -🤓')
     end)
+end
+
+local function fireEvent(...)
+	local old = getthreadidentity()
+	setthreadidentity(2)
+	Multibox.Network.Fire(...)
+	setthreadidentity(old)
+end
+
+local function fireFunction(...)
+	local old = getthreadidentity()
+	setthreadidentity(2)
+	Multibox.Network.Invoke(...)
+	setthreadidentity(old)
 end
 
 local staff = {
@@ -211,52 +232,9 @@ if game.PlaceId ~= 10255454029 then --// game only modules
                     end
                 end
 
-                local argsTable = {
-                    [1] = {
-                        [1] = {
-                            [1] = "\18",
-                            [2] = swordName,
-                            [3] = nil,
-                            [4] = targetPos or Vector3.new(0, 0, 0),
-                            [5] = {
-                                [1] = nil,
-                                [2] = nil,
-                                [3] = nil,
-                                [4] = nil,
-                                [5] = nil,
-                                [6] = nil,
-                                [7] = nil,
-                                [8] = nil,
-                                [9] = nil,
-                                [10] = nil,
-                                [11] = nil,
-                                [12] = lplr.Character.LeftLowerLeg,
-                                [13] = lplr.Character.LeftFoot,
-                                [14] = lplr.Character.RightFoot,
-                                [15] = lplr.Character.RightLowerLeg,
-                                [16] = lplr.Character.RightUpperLeg,
-                                [17] = lplr.Character.LeftUpperLeg,
-                                [18] = lplr.Character.LeftHand,
-                                [19] = lplr.Character.LeftLowerArm,
-                                [20] = lplr.Character.LowerTorso,
-                                [21] = lplr.Character.HumanoidRootPart,
-                                [22] = lplr.Character.UpperTorso,
-                                [23] = lplr.Character.RightLowerArm,
-                                [24] = lplr.Character[swordName].Handle,
-                                [25] = lplr.Character[swordName].SwordPart,
-                                [26] = lplr.Character.RightUpperArm,
-                                [27] = lplr.Character.LeftUpperArm,
-                                [28] = nil,
-                                [29] = lplr.Character.RightHand,
-                                [30] = lplr.Character[swordName].SwordPart,
-                                [31] = lplr.Character[swordName].SwordPart,
-                                [32] = lplr.Character.Head
-                            }
-                        }
-                    }
-                }
+                if not targetPos then continue end
 
-               ReplicatedStorage.RemoteEvent:FireServer(unpack(argsTable))
+                fireEvent("SwordSlash", swordName, nearestPlayer.Character.HumanoidRootPart, CFrame.lookAt(lplr.Character.HumanoidRootPart.Position, nearestPlayer.HumanoidRootPart.Position).LookVector, {nearestPlayer.HumanoidRootPart})
             end
         else
             _G.KillAura = false
