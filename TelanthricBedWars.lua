@@ -1,6 +1,6 @@
 repeat task.wait() until game:IsLoaded()
 
-print("Updated version")
+print("Updated version (2)")
 
 local queueTeleport = syn and syn.queue_on_teleport or queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
 queueTeleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/TelanthricBedWars.lua", true))()')
@@ -23,23 +23,19 @@ GuiLibrary.CreateWindow("Utility")
 GuiLibrary.CreateWindow("World")
 
 do --// autonerd functionality
-    TextChatService.MessageReceived:Connect(function()
-        print("Server received message")
-        autoNerdResponseCooldown = true
-        task.wait(0.2)
-        autoNerdResponseCooldown = false
+    TextChatService.SendingMessage:Connect(function(textChatMessage)
+        autoNerdLastSentBySelf = textChatMessage
     end)
 
-    function TextChatService.OnIncomingMessage(textChatMessage)
-        print("incoming message: " .. textChatMessage.Text)
-        task.wait(0.1)
-        if autoNerdResponseCooldown == true then return end
-        if autoNerdEnabled then
-            print("passed cooldown and enabled checks")
+    TextChatService.MessageReceived:Connect(function(textChatMessage)
+        print("Server received message: " .. textChatMessage.Text)
+        if autoNerdEnabled == false then return end
+        if textChatMessage == autoNerdLastSentBySelf then return end
+
+        print("passed checks")
             local msg = textChatMessage.Text
             TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync('"' .. msg .. '" -🤓')
-        end
-    end
+    end)
 end
 
 local staff = {
@@ -377,7 +373,8 @@ StaffDetector = GuiLibrary.CreateModule("Utility", "StaffDetector", function(cal
 end)
 
 autoNerdEnabled = false
-autoNerdResponseCooldown = false
+autoNerdLastSentBySelf = nil
+
 AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
     if callback then
         autoNerdEnabled = true
