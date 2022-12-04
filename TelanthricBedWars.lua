@@ -4,6 +4,7 @@ local queueTeleport = syn and syn.queue_on_teleport or queue_on_teleport or flux
 queueTeleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/TelanthricBedWars.lua", true))()')
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextChatService =  game:GetService("TextChatService")
 local Players = game:GetService("Players")
 
 local lplr = Players.LocalPlayer
@@ -17,6 +18,23 @@ GuiLibrary.CreateWindow("Blatant")
 GuiLibrary.CreateWindow("Render")
 GuiLibrary.CreateWindow("Utility")
 GuiLibrary.CreateWindow("World")
+
+do --// autonerd functionality
+    TextChatService.MessageReceived:Connect(function()
+        autoNerdResponseCooldown = true
+        task.wait(0.2)
+        autoNerdResponseCooldown = false
+    end)
+
+    function TextChatService.OnIncomingMessage(textChatMessage)
+        task.wait(0.1)
+        if autoNerdResponseCooldown == true then return end
+        if autoNerdEnabled then
+            local msg = textChatMessage
+            TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync('"' .. msg .. '" -🤓')
+        end
+    end
+end
 
 local staff = {
     Moderators = {
@@ -353,8 +371,11 @@ StaffDetector = GuiLibrary.CreateModule("Utility", "StaffDetector", function(cal
 end)
 
 local chattedConnection
+autoNerdEnabled = false
+autoNerdResponseCooldown = false
 AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
     if callback then
+        autoNerdEnabled = true
         local chatEventsFolder = ReplicatedStorage:WaitForChild("DefaultChatSystemChatEvents")
         chatEventsFolder.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageObj)
             if messageObj.FromSpeaker ~= lplr.Name then
@@ -363,6 +384,7 @@ AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
             end
         end)
     else
+        autoNerdEnabled = false
         if chattedConnection then
             chattedConnection:Disconnect()
         end
