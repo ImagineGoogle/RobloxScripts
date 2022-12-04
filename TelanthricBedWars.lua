@@ -1,6 +1,6 @@
 repeat task.wait() until game:IsLoaded()
 
-print("Updated version (6)")
+print("Updated version (7)")
 
 local queueTeleport = syn and syn.queue_on_teleport or queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
 queueTeleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/TelanthricBedWars.lua", true))()')
@@ -27,16 +27,16 @@ do --// autonerd functionality
         task.wait(0.2)
         local msg = textChatMessage.Text
 
-        print("Server received message: " .. textChatMessage.Text)
         if autoNerdEnabled == false then return end
         print("Passed enabled check")
+        print("Server received message: " .. textChatMessage.Text)
         if textChatMessage.TextSource.UserId == lplr.UserId then return end
         print("Passed self-message check")
         if string.match(msg, "You are now on the") then return end
         print("Passed non-system message check")
 
         print("passed checks")
-        TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync('"' .. msg .. '" -' .. string.char(63))
+        TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync('"' .. msg .. '" -🤓' .. string.char(63))
     end)
 end
 
