@@ -3,6 +3,7 @@ repeat task.wait() until game:IsLoaded()
 local queueTeleport = syn and syn.queue_on_teleport or queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
 queueTeleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/TelanthricBedWars.lua", true))()')
 
+local ProximityPromptService = game:GetService("ProximityPromptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextChatService =  game:GetService("TextChatService")
 local Players = game:GetService("Players")
@@ -21,16 +22,19 @@ GuiLibrary.CreateWindow("World")
 
 do --// autonerd functionality
     TextChatService.MessageReceived:Connect(function()
+        print("Server received message")
         autoNerdResponseCooldown = true
         task.wait(0.2)
         autoNerdResponseCooldown = false
     end)
 
     function TextChatService.OnIncomingMessage(textChatMessage)
+        print("incoming message: " .. textChatMessage.Text)
         task.wait(0.1)
         if autoNerdResponseCooldown == true then return end
         if autoNerdEnabled then
-            local msg = textChatMessage
+            print("passed cooldown and enabled checks")
+            local msg = textChatMessage.Text
             TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync('"' .. msg .. '" -🤓')
         end
     end
@@ -370,23 +374,12 @@ StaffDetector = GuiLibrary.CreateModule("Utility", "StaffDetector", function(cal
     end
 end)
 
-local chattedConnection
 autoNerdEnabled = false
 autoNerdResponseCooldown = false
 AutoNerd = GuiLibrary.CreateModule("Utility", "AutoNerd", function(callback)
     if callback then
         autoNerdEnabled = true
-        local chatEventsFolder = ReplicatedStorage:WaitForChild("DefaultChatSystemChatEvents")
-        chatEventsFolder.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageObj)
-            if messageObj.FromSpeaker ~= lplr.Name then
-                local msg = messageObj.Message
-                chatEventsFolder.SayMessageRequest:FireServer('"' .. msg .. '" -🤓', "All")
-            end
-        end)
     else
         autoNerdEnabled = false
-        if chattedConnection then
-            chattedConnection:Disconnect()
-        end
     end
 end)
