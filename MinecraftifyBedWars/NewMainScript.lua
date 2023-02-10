@@ -21,7 +21,7 @@ local queueteleport = syn and syn.queue_on_teleport or queue_on_teleport
 local getasset = getsynasset or getcustomasset
 
 if config.ExecuteOnTeleport ~= false then
-    queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/MinecraftifyBedWars/MainScript.lua'))()")
+    queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/MinecraftifyBedWars/NewMainScript.lua'))()")
 end
 
 if not game:IsLoaded() then
