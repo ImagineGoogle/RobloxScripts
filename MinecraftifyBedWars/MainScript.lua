@@ -1,9 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
 local Teams = game:GetService("Teams")
 
 local localPlayer = game:GetService("Players").LocalPlayer
+local config = getgenv().MinecraftifyBedWarsConfig
 local mouse = localPlayer:GetMouse()
 local folderName = "BedWarsUI/"
 local guiObjects = {}
@@ -18,14 +20,15 @@ local requestfunc = syn and syn.request or http and http.request or http_request
 local queueteleport = syn and syn.queue_on_teleport or queue_on_teleport
 local getasset = getsynasset or getcustomasset
 
-queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/MinecraftifyBedWars/MainScript.lua'))()")
+if config.ExecuteOnTeleport ~= false then
+    queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/MinecraftifyBedWars/MainScript.lua'))()")
+end
 
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
 local Knit = require(ReplicatedStorage["rbxts_include"]["node_modules"]["@easy-games"]["knit"]["src"]).KnitClient
---print(CameraPerspectiveController:getCameraPerspective())
 
 local modules = {
     ["CameraPerspectiveController"] = Knit.Controllers.CameraPerspectiveController,
@@ -528,6 +531,13 @@ do -- block textures
             end
         end
         return oldWeld(self, model, ...)
+    end
+end
+
+do -- bottom chat
+    if config.BottomChat ~= false then
+        local chatWindowSize = StarterGui:GetCore("ChatWindowSize")
+        StarterGui:SetCore("ChatWindowPosition", UDim2.new(0,0, 1 - chatWindowSize.Y.Scale), 0 - chatWindowSize.Y.Offset)
     end
 end
 
