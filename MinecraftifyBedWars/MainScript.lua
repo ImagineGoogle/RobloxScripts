@@ -18,7 +18,7 @@ local requestfunc = syn and syn.request or http and http.request or http_request
 local queueteleport = syn and syn.queue_on_teleport or queue_on_teleport
 local getasset = getsynasset or getcustomasset
 
-queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/MinecraftifyBedWars/MainScript.lua'))")
+queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/MinecraftifyBedWars/MainScript.lua'))()")
 
 if not game:IsLoaded() then
     game.Loaded:Wait()
