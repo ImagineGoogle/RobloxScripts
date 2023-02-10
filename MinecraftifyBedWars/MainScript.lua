@@ -28,7 +28,8 @@ local Knit = require(ReplicatedStorage["rbxts_include"]["node_modules"]["@easy-g
 --print(CameraPerspectiveController:getCameraPerspective())
 
 local modules = {
-    CameraPerspectiveController = Knit.Controllers.CameraPerspectiveController
+    ["CameraPerspectiveController"] = Knit.Controllers.CameraPerspectiveController,
+    ["WeldTable"] = require(ReplicatedStorage.TS.util["weld-util"]).WeldUtil
 }
 
 local function betterisfile(path)
@@ -448,7 +449,8 @@ do -- block textures
         wool_blue = "wool_blue",
         wool_purple = "wool_purple",
         wool_pink = "wool_pink",
-        dirt = "dirt"
+        dirt = "dirt",
+        stone = "stone"
     }
 
     local function updateBlockTextures(block)
@@ -485,8 +487,8 @@ do -- block textures
         block.DescendantAdded:Connect(function(texture)
             local textureTable = textures[block.Name]
             if not textureTable then return end
-            if type(textureTable) == "table" then
-                if texture:IsA("Texture") then
+            if texture:IsA("Texture") then
+                if type(textureTable) == "table" then
                     if texture.Name == "Top" then
                         texture.Texture = getcustomassetfunc("textures/" .. textureTable[1] .. ".png")
                     elseif texture.Name == "Bottom" then
@@ -494,12 +496,39 @@ do -- block textures
                     else
                         texture.Texture = getcustomassetfunc("textures/" .. textureTable[3] .. ".png")
                     end
+                else
+                    texture.Texture = getcustomassetfunc("textures/" .. textureTable .. ".png")
                 end
-            else
-                texture.Texture = getcustomassetfunc("textures/" .. textureTable .. ".png")
             end
         end)
     end)
+    local oldWeld = modules.WeldTable.weldCharacterAccessories
+    modules.WeldTable.weldCharacterAccessories = function(self, model, ...)
+        for _, block in ipairs(model:GetChildren()) do
+            local textureTable = textures[block.Name]
+            if textureTable then
+                task.spawn(function()
+                    updateBlockTextures(block)
+                    block.DescendantAdded:Connect(function(texture)
+                        if texture:IsA("Texture") then
+                            if type(textureTable) == "table" then
+                                if texture.Name == "Top" then
+                                    texture.Texture = getcustomassetfunc("textures/" .. textureTable[1] .. ".png")
+                                elseif texture.Name == "Bottom" then
+                                    texture.Texture = getcustomassetfunc("textures/" .. textureTable[2] .. ".png")
+                                else
+                                    texture.Texture = getcustomassetfunc("textures/" .. textureTable[3] .. ".png")
+                                end
+                            else
+                                texture.Texture = getcustomassetfunc("textures/" .. textureTable .. ".png")
+                            end
+                        end
+                    end)
+                end)
+            end
+        end
+        return oldWeld(self, model, ...)
+    end
 end
 
 -- local ReplicatedStorage = game:GetService("ReplicatedStorage")
