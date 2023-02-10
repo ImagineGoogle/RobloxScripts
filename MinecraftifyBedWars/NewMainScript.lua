@@ -434,8 +434,14 @@ end
 
 do -- crosshair
     RunService.RenderStepped:Connect(function()
-        if modules.CameraPerspectiveController:getCameraPerspective() == 0 then
-            mouse.Icon = getcustomassetfunc("textures/crosshair.png")
+        local character = localPlayer.Character
+        if character then
+            local head = character:FindFirstChild("Head")
+            if head then
+                if (head.CFrame.Position - workspace.CurrentCamera.CFrame.Position).Magnitude < 1 then
+                    mouse.Icon = getcustomassetfunc("textures/crosshair.png")
+                end
+            end
         end
     end)
 end
