@@ -1,13 +1,24 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 local Teams = game:GetService("Teams")
 
 local localPlayer = game:GetService("Players").LocalPlayer
+local mouse = localPlayer:GetMouse()
+local folderName = "BedWarsUI/"
 local guiObjects = {}
+local cachedAssets = {}
+local cachedAssets2 = {}
 local mainScreenGui
 local betterTeamColours = {
     Green = Color3.fromRGB(83, 211, 51)
 }
+
+local requestfunc = syn and syn.request or http and http.request or http_request or fluxus and fluxus.request or getgenv().request or request
+local queueteleport = syn and syn.queue_on_teleport or queue_on_teleport
+local getasset = getsynasset or getcustomasset
+
+queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/MinecraftifyBedWars/MainScript.lua'))")
 
 if not game:IsLoaded() then
     game.Loaded:Wait()
@@ -19,6 +30,48 @@ local Knit = require(ReplicatedStorage["rbxts_include"]["node_modules"]["@easy-g
 local modules = {
     CameraPerspectiveController = Knit.Controllers.CameraPerspectiveController
 }
+
+local function betterisfile(path)
+    if cachedAssets2[path] == nil then
+        cachedAssets2[path] = isfile(folderName .. path)
+    end
+    return cachedAssets2[path]
+end
+
+local function getcustomassetfunc(path)
+	if not isfile(folderName .. path) then
+		local req = requestfunc({
+			Url = "https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/MinecraftifyBedWars/" .. path,
+			Method = "GET"
+		})
+		writefile(folderName .. path, req.Body)
+	end
+    if cachedAssets[folderName .. path] == nil then
+        cachedAssets[folderName .. path] = getasset(folderName .. path)
+    end
+	return cachedAssets[folderName .. path]
+end
+
+local function downloadassets(path)
+    local json = requestfunc({
+        Url = "https://api.github.com/repos/ImagineGoogle/RobloxScripts/contents/MinecraftifyBedWars/".. path,
+        Method = "GET"
+    })
+    local decodedjson = game:GetService("HttpService"):JSONDecode(json.Body)
+    for i, v in pairs(decodedjson) do
+        if v["type"] == "file" then
+			getcustomassetfunc(path.."/"..v["name"])
+		end
+    end
+end
+
+if not isfolder("BedWarsUI") then
+    makefolder("BedWarsUI")
+end
+if not isfolder("BedWarsUI/textures") then
+    makefolder("BedWarsUI/textures")
+end
+downloadassets("BedWarsUI/textures")
 
 local function createMainGui()
     mainScreenGui = Instance.new("ScreenGui")
@@ -335,28 +388,22 @@ local function createTeam(name, team)
     
             for _, player in ipairs(team:GetPlayers()) do
                 if player:FindFirstChild("leaderstats") then
-                    if player.leaderstats.Bed.Value ~= "âœ…" then
-                        print("No bed but on team!")
+                    if player.leaderstats.Bed.Value ~= "✅" then
                         teamnobed += 1
                     end
                 end
             end
-
-            print("Team plrs:", teamplrs)
-            print("teamnobed:", teamnobed)
     
             if teamplrs ~= 0 and teamnobed ~= 0 then
-                print("Has no bed but has players")
                 Players.Text = tostring(teamplrs)
                 if Label.Text ~= "Red:" then
                     Players.Text = " " .. tostring(teamplrs)
                 end
                 Players.TextColor3 = Color3.fromRGB(255, 255, 0)
             elseif teamplrs ~= 0 and teamnobed == 0 then
-                print("Has bed and players")
-                Players.Text = "âœ“"
+                Players.Text = "✓"
                 if Label.Text ~= "Red:" then
-                    Players.Text = " âœ“"
+                    Players.Text = " ✓"
                 end
                 Players.TextColor3 = Color3.fromRGB(63, 255, 53)
             elseif teamplrs == 0 then
@@ -379,6 +426,80 @@ for _, team in ipairs(Teams:GetTeams()) do
     if team.Name ~= "Spectators" and team.Name ~= "Neutral" then
         createTeam(team.Name, team)
     end
+end
+
+do -- crosshair
+    RunService.RenderStepped:Connect(function()
+        if modules.CameraPerspectiveController:getCameraPerspective() == 0 then
+            mouse.Icon = getcustomassetfunc("textures/crosshair.png")
+        end
+    end)
+end
+
+do -- block textures
+    local textures = {
+        grass = {"grass_top", "dirt", "grass_side"},
+        wool_white = "wool_white",
+        wool_red = "wool_red",
+        wool_orange = "wool_orange",
+        wool_yellow = "wool_yellow",
+        wool_green = "wool_green",
+        wool_cyan = "wool_cyan",
+        wool_blue = "wool_blue",
+        wool_purple = "wool_purple",
+        wool_pink = "wool_pink",
+        dirt = "dirt"
+    }
+
+    local function updateBlockTextures(block)
+        local textureTable = textures[block.Name]
+        if textureTable then
+            if type(textureTable) == "table" then
+                for _, texture in ipairs(block:GetDescendants()) do
+                    if texture:IsA("Texture") then
+                        if texture.Name == "Top" then
+                            texture.Texture = getcustomassetfunc("textures/" .. textureTable[1] .. ".png")
+                        elseif texture.Name == "Bottom" then
+                            texture.Texture = getcustomassetfunc("textures/" .. textureTable[2] .. ".png")
+                        else
+                            texture.Texture = getcustomassetfunc("textures/" .. textureTable[3] .. ".png")
+                        end
+                    end
+                end
+            else
+                for _, texture in ipairs(block:GetDescendants()) do
+                    if texture:IsA("Texture") then
+                        texture.Texture = getcustomassetfunc("textures/" .. textureTable .. ".png")
+                    end
+                end
+            end
+        end
+    end
+    task.spawn(function()
+        for _, block in ipairs(CollectionService:GetTagged("block")) do
+            updateBlockTextures(block)
+        end
+    end)
+    game:GetService("CollectionService"):GetInstanceAddedSignal("block"):Connect(function(block)
+        updateBlockTextures(block)
+        block.DescendantAdded:Connect(function(texture)
+            local textureTable = textures[block.Name]
+            if not textureTable then return end
+            if type(textureTable) == "table" then
+                if texture:IsA("Texture") then
+                    if texture.Name == "Top" then
+                        texture.Texture = getcustomassetfunc("textures/" .. textureTable[1] .. ".png")
+                    elseif texture.Name == "Bottom" then
+                        texture.Texture = getcustomassetfunc("textures/" .. textureTable[2] .. ".png")
+                    else
+                        texture.Texture = getcustomassetfunc("textures/" .. textureTable[3] .. ".png")
+                    end
+                end
+            else
+                texture.Texture = getcustomassetfunc("textures/" .. textureTable .. ".png")
+            end
+        end)
+    end)
 end
 
 -- local ReplicatedStorage = game:GetService("ReplicatedStorage")
