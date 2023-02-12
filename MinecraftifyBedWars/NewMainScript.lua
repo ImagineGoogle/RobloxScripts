@@ -1,10 +1,3 @@
-getgenv().MinecraftifyBedWarsConfig = {
-	["ExecuteOnTeleport"] = false,
-	["BottomChat"] = false,
-	["OpenChatKeyCode"] = Enum.KeyCode.Slash,
-    ["ScoreboardAliveText"] = "✓",
-    ["UseDisplayNames"] = true
-}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local UserInputService = game:GetService("UserInputService")
