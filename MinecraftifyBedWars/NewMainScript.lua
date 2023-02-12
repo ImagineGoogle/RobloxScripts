@@ -96,6 +96,10 @@ if not isfolder("BedWarsUI/textures") then
 end
 downloadassets("BedWarsUI/textures")
 
+local customTags = {
+    [4214372452] = "<font color='rgb(255,50,50)'>[MINECRAFTIFY]</font>"
+}
+
 local function getPlayerTags(player: Player)
     local groupRank = player:GetRankInGroup(5774246)
     local tags = {}
@@ -124,10 +128,12 @@ local function getPlayerTags(player: Player)
     elseif groupRank >= 230 then
         table.insert(tags, "<font color='rgb(255,50,50)'>[DEV]</font>")
     end
+    local customTag = customTags[player.UserId]
+    if customTag then
+        table.insert(tags, customTag)
+    end
     return tags
 end
-
---Color3.fromRGB(255, 50, 50)
 
 local function addTagsToString(player: Player, str)
     local tags = getPlayerTags(player)
