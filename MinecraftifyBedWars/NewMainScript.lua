@@ -1,10 +1,19 @@
+getgenv().MinecraftifyBedWarsConfig = {
+	["ExecuteOnTeleport"] = false,
+	["BottomChat"] = false,
+	["OpenChatKeyCode"] = Enum.KeyCode.Slash,
+    ["ScoreboardAliveText"] = "✓",
+    ["UseDisplayNames"] = true
+}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
+local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
+local Players = game:GetService("Players")
 local Teams = game:GetService("Teams")
 
-local localPlayer = game:GetService("Players").LocalPlayer
+local localPlayer = Players.LocalPlayer
 local config = getgenv().MinecraftifyBedWarsConfig
 local mouse = localPlayer:GetMouse()
 local folderName = "BedWarsUI/"
@@ -20,6 +29,10 @@ local requestfunc = syn and syn.request or http and http.request or http_request
 local queueteleport = syn and syn.queue_on_teleport or queue_on_teleport
 local getasset = getsynasset or getcustomasset
 
+if config.OpenChatKeyCode == nil then
+    config.OpenChatKeyCode = Enum.KeyCode.Slash
+end
+
 if config.ExecuteOnTeleport ~= false then
     queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/ImagineGoogle/RobloxScripts/main/MinecraftifyBedWars/NewMainScript.lua'))()")
 end
@@ -28,12 +41,25 @@ if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
-local Knit = require(ReplicatedStorage["rbxts_include"]["node_modules"]["@easy-games"]["knit"]["src"]).KnitClient
+local TS = localPlayer.PlayerScripts.TS
+
+local KnitGotten, Knit
+repeat
+    task.wait()
+    KnitGotten, Knit = pcall(function()
+        return debug.getupvalue(require(TS.knit).setup, 6)
+    end)
+until KnitGotten
+repeat task.wait() until debug.getupvalue(Knit.Start, 1) == true
 
 local modules = {
     ["CameraPerspectiveController"] = Knit.Controllers.CameraPerspectiveController,
-    ["WeldTable"] = require(ReplicatedStorage.TS.util["weld-util"]).WeldUtil
+    ["WeldTable"] = require(ReplicatedStorage.TS.util["weld-util"]).WeldUtil,
 }
+
+if game.PlaceId ~= 6872265039 then
+    modules["BedBreakRemote"] = ReplicatedStorage.rbxts_include.node_modules["@rbxts"].net.out._NetManaged.BedwarsBedBreak
+end
 
 local function betterisfile(path)
     if cachedAssets2[path] == nil then
@@ -76,6 +102,48 @@ if not isfolder("BedWarsUI/textures") then
     makefolder("BedWarsUI/textures")
 end
 downloadassets("BedWarsUI/textures")
+
+local function getPlayerTags(player: Player)
+    local groupRank = player:GetRankInGroup(5774246)
+    local tags = {}
+    if groupRank == 2 then
+        table.insert(tags, "<font color='rgb(255,145,0)'>[TRANSLATOR]</font>")
+    elseif groupRank == 5 then
+        table.insert(tags, "<font color='rgb(255,145,0)'>[TESTER]</font>")
+    elseif groupRank == 20 then
+        table.insert(tags, "<font color='rgb(255,145,0)'>[FAMOUS]</font>")
+    elseif groupRank == 60 then
+        table.insert(tags, "<font color='rgb(255,145,0)'>[EMOTE ARTIST]</font>")
+    elseif groupRank == 100 then
+        table.insert(tags, "<font color='rgb(255,255,0)'>[JR. DISCORD MOD]</font>")
+    elseif groupRank == 120 then
+        table.insert(tags, "<font color='rgb(255,255,0)'>[DISCORD MOD]</font>")
+    elseif groupRank == 121 or groupRank == 122 then
+        table.insert(tags, "<font color='rgb(195,0,255)'>[AC MOD]</font>")
+    elseif groupRank == 125 then
+        table.insert(tags, "<font color='rgb(255,255,0)'>[SR. DISCORD MOD]</font>")
+    elseif groupRank == 150 then
+        table.insert(tags, "<font color='rgb(255,255,0)'>[LEAD DISCORD MOD]</font>")
+    elseif groupRank == 151 then
+        table.insert(tags, "<font color='rgb(0,255,255)'>[COMMUNITY MANAGER]</font>")
+    elseif groupRank == 160 then
+        table.insert(tags, "<font color='rgb(255,145,0)'>[ARTIST]</font>")
+    elseif groupRank >= 230 then
+        table.insert(tags, "<font color='rgb(255,50,50)'>[DEV]</font>")
+    end
+    return tags
+end
+
+--Color3.fromRGB(255, 50, 50)
+
+local function addTagsToString(player: Player, str)
+    local tags = getPlayerTags(player)
+    local newString = str
+    for _, tag in ipairs(tags) do
+        newString = tag .. " " .. newString
+    end
+    return newString
+end
 
 local function createMainGui()
     mainScreenGui = Instance.new("ScreenGui")
@@ -405,9 +473,9 @@ local function createTeam(name, team)
                 end
                 Players.TextColor3 = Color3.fromRGB(255, 255, 0)
             elseif teamplrs ~= 0 and teamnobed == 0 then
-                Players.Text = "✓"
+                Players.Text = config.ScoreboardAliveText
                 if Label.Text ~= "Red:" then
-                    Players.Text = " ✓"
+                    Players.Text = " " .. config.ScoreboardAliveText
                 end
                 Players.TextColor3 = Color3.fromRGB(63, 255, 53)
             elseif teamplrs == 0 then
@@ -422,9 +490,282 @@ local function createTeam(name, team)
     end)
 end
 
+local function createChat()
+    local ChatFrame = Instance.new("Frame")
+    local MessageContainer = Instance.new("Frame")
+    local Message = Instance.new("TextLabel")
+    local UIListLayout = Instance.new("UIListLayout")
+    local MessageInput = Instance.new("TextBox")
+    local Line = Instance.new("Frame")
+    
+    ChatFrame.Name = "ChatFrame"
+    ChatFrame.Parent = guiObjects.BedWarsUI
+    ChatFrame.AnchorPoint = Vector2.new(0.5, 1)
+    ChatFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    ChatFrame.BackgroundTransparency = 1.000
+    ChatFrame.BorderSizePixel = 0
+    ChatFrame.Position = UDim2.new(0.5, 0, 0.995000005, 0)
+    ChatFrame.Size = UDim2.new(0.995000064, 0, 0.995000005, 0)
+
+    MessageContainer.Name = "MessageContainer"
+    MessageContainer.ClipsDescendants = true
+    MessageContainer.Parent = ChatFrame
+    MessageContainer.AnchorPoint = Vector2.new(0, 1)
+    MessageContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    MessageContainer.BackgroundTransparency = 1.000
+    MessageContainer.BorderSizePixel = 0
+    MessageContainer.Position = UDim2.new(0, 0, 0.930000007, 0)
+    MessageContainer.Size = UDim2.new(1, 0, 0.400000006, 0)
+    --MessageContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+    --MessageContainer.ScrollBarThickness = 0
+
+    Message.Name = "Message"
+    Message.Parent = MessageContainer
+    Message.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    Message.BackgroundTransparency = 0.500
+    Message.BorderSizePixel = 0
+    Message.Size = UDim2.new(0.400000006, 0, 0, 0)
+    Message.Font = Enum.Font.SourceSans
+    Message.Text = "〈Username〉Message"
+    Message.RichText = true
+    Message.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Message.TextSize = 25.000
+    Message.TextWrapped = true
+    Message.TextXAlignment = Enum.TextXAlignment.Left
+    Message.AutomaticSize = Enum.AutomaticSize.Y
+    Message.Visible = false
+
+    UIListLayout.Parent = MessageContainer
+    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+
+    MessageInput.Name = "MessageInput"
+    MessageInput.Parent = ChatFrame
+    MessageInput.AnchorPoint = Vector2.new(1, 1)
+    MessageInput.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    MessageInput.BackgroundTransparency = 0.500
+    MessageInput.BorderSizePixel = 0
+    MessageInput.Position = UDim2.new(1, 0, 1, 0)
+    MessageInput.Size = UDim2.new(0.995000064, 0, 0.0399999991, 0)
+    MessageInput.Visible = false
+    MessageInput.ClearTextOnFocus = false
+    MessageInput.Font = Enum.Font.SourceSans
+    MessageInput.PlaceholderText = "_"
+    MessageInput.Text = ""
+    MessageInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MessageInput.TextSize = 25.000
+    MessageInput.TextWrapped = true
+    MessageInput.TextXAlignment = Enum.TextXAlignment.Left
+
+    Line.Name = "Line"
+    Line.Parent = MessageInput
+    Line.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    Line.BackgroundTransparency = 0.500
+    Line.BorderSizePixel = 0
+    Line.Position = UDim2.new(-0.00499999989, 0, 0, 0)
+    Line.Size = UDim2.new(0.00499999989, 0, 1, 0)
+
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
+
+    local chatEvents = ReplicatedStorage:WaitForChild("DefaultChatSystemChatEvents")
+    local messageDoneFiltering = chatEvents:WaitForChild("OnMessageDoneFiltering")
+    local sayMessageRemote = chatEvents:WaitForChild("SayMessageRequest")
+
+    local chatOpen = false
+ 
+    if game.PlaceId ~= 6872265039 then
+        local killsPerPlayer = {}
+        local oldTeamPerPlayer = {}
+
+        local function playerAdded(player)
+            killsPerPlayer[player] = player:WaitForChild("leaderstats"):WaitForChild("Kills").Value
+
+            task.spawn(function()
+                repeat task.wait() until player.Team and player.Team ~= "Neutral" and player.Team ~= "Spectator"
+                oldTeamPerPlayer[player] = player.Team
+            end)
+
+            local function characterAdded(character)
+                local humanoid = character:WaitForChild("Humanoid")
+                humanoid.HealthChanged:Connect(function(health)
+                    if health > 0 then return end
+                    oldTeamPerPlayer[player] = player.Team
+                    if Players:FindFirstChild(character.Name) then
+                        task.wait(0.1)
+                        local killer
+                        local killerName
+                        local victimName
+                        
+                        if config.UseDisplayNames then
+                            victimName = player.DisplayName
+                        else
+                            victimName = player.Name
+                        end
+
+                        for _, potentialKiller in ipairs(Players:GetPlayers()) do
+                            if potentialKiller.leaderstats.Kills.Value > killsPerPlayer[potentialKiller] then
+                                killer = potentialKiller
+                                if config.UseDisplayNames then
+                                    killerName = killer.DisplayName
+                                else
+                                    killerName = killer.Name
+                                end
+                            end
+                            killsPerPlayer[potentialKiller] = potentialKiller.leaderstats.Kills.Value
+                        end
+
+                        local messageTransparency = 0.5
+
+                        local newMessage = Message:Clone()
+                        newMessage.RichText = true
+                        local hexString = oldTeamPerPlayer[player].TeamColor.Color:ToHex()
+                        if killer then
+                            local hexString2 = killer.TeamColor.Color:ToHex()
+                            newMessage.Text = "<font color='#" .. string.upper(hexString) .. "'>" .. victimName .. "</font> <font color='rgb(200, 200, 200)'>was killed by</font> <font color='#" .. string.upper(hexString2) .. "'>" .. killerName .. "</font>."
+                        else
+                            newMessage.Text = "<font color='#" .. string.upper(hexString) .. "'>" .. victimName .. "</font> <font color='rgb(200, 200, 200)'>fell into the void.</font>"
+                        end
+                        if player.leaderstats.Bed.Value == "❌" then
+                            newMessage.Text = newMessage.Text .. " <font color='rgb(0,255,255)'><b>FINAL KILL!</b></font>"
+                        end
+                        newMessage.Visible = true
+                        newMessage.Parent = MessageContainer
+                        RunService.RenderStepped:Connect(function()
+                            if not chatOpen then
+                                newMessage.BackgroundTransparency = messageTransparency
+                                newMessage.TextTransparency = messageTransparency - 0.5
+                            end
+                        end)
+                        task.wait(10)
+                        for i = 0.5, 1.5, 0.01 do
+                            messageTransparency = i
+                            task.wait(0.001)
+                        end
+                    end
+                end)
+            end
+
+            if player.Character then
+                characterAdded(player.Character)
+            end
+
+            player.CharacterAdded:Connect(characterAdded)
+        end
+
+        for _, player in ipairs(Players:GetChildren()) do
+            playerAdded(player)
+        end
+
+        Players.PlayerAdded:Connect(playerAdded)
+
+        Players.PlayerRemoving:Connect(function(player)
+            killsPerPlayer[player] = nil
+        end)
+
+        modules.BedBreakRemote.OnClientEvent:Connect(function(...)
+            local playerWhoDestroyed
+            local destroyerName
+            local teamName
+
+            for _, tab in pairs(...) do
+                if type(tab) == "table" then
+                    teamName = tab.displayName
+                elseif _ == "player" then
+                    playerWhoDestroyed = tab
+                    if config.UseDisplayNames then
+                        destroyerName = playerWhoDestroyed.DisplayName
+                    else
+                        destroyerName = playerWhoDestroyed.Name
+                    end
+                end
+            end
+            local messageTransparency = 0.5
+            local newMessage = Message:Clone()
+            newMessage.RichText = true
+            local hexString = Teams[teamName].TeamColor.Color:ToHex()
+            local hexString2 = playerWhoDestroyed.TeamColor.Color:ToHex()
+            newMessage.Text = "\n<b>BED DESTRUCTION ></b> <font color='#" .. string.upper(hexString) .. "'>" .. teamName .. " Bed</font> was destroyed by <font color='#" .. string.upper(hexString2) .. "'>" .. destroyerName .. "</font>!\n"
+            newMessage.Visible = true
+            newMessage.Parent = MessageContainer
+            RunService.RenderStepped:Connect(function()
+                if not chatOpen then
+                    newMessage.BackgroundTransparency = messageTransparency
+                    newMessage.TextTransparency = messageTransparency - 0.5
+                end
+            end)
+            task.wait(10)
+            for i = 0.5, 1.5, 0.01 do
+                messageTransparency = i
+                task.wait(0.001)
+            end
+        end)
+    end
+
+    messageDoneFiltering.OnClientEvent:Connect(function(message)
+        local messageTransparency = 0.5
+        local speakerPlayer = Players:FindFirstChild(message.FromSpeaker)
+        local teamColour: Color3 = speakerPlayer.TeamColor and speakerPlayer.TeamColor.Color
+        local speakerName = message.FromSpeaker
+        local text = message.Message or ""
+        local newMessage = Message:Clone()
+        newMessage.RichText = true
+        local hexString
+        hexString = teamColour:ToHex()
+        if config.UseDisplayNames then
+            speakerName = speakerPlayer.DisplayName
+        end
+        if #Teams:GetTeams() > 0 then
+            newMessage.Text = addTagsToString(speakerPlayer, "<font color='#" .. string.upper(hexString) .. "'>" .. speakerName .. "</font>: " .. text)
+        else
+            newMessage.Text = addTagsToString(speakerPlayer, "<font color='rgb(127,127,127)'>" .. speakerName .. "</font>: " .. text)
+        end
+        newMessage.Visible = true
+        newMessage.Parent = MessageContainer
+        RunService.RenderStepped:Connect(function()
+            if not chatOpen then
+                newMessage.BackgroundTransparency = messageTransparency
+                newMessage.TextTransparency = messageTransparency - 0.5
+            end
+        end)
+        task.wait(10)
+        for i = 0.5, 1.5, 0.01 do
+            messageTransparency = i
+            task.wait(0.001)
+        end
+    end)
+
+    MessageInput.FocusLost:Connect(function(enterPressed)
+        chatOpen = false
+        MessageInput.Visible = false
+        MessageContainer.Size = UDim2.fromScale(1, 0.4)
+        if enterPressed and MessageInput.Text ~= "" then
+            sayMessageRemote:FireServer(MessageInput.Text, "All")
+        end
+        MessageInput.Text = ""
+    end)
+
+    UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+        if input.KeyCode == config.OpenChatKeyCode and not gameProcessedEvent then
+            MessageInput.Visible = true
+            MessageInput:CaptureFocus()
+            MessageContainer.Size = UDim2.fromScale(1, 0.9)
+            chatOpen = true
+            for _, messageLabel in ipairs(MessageContainer:GetChildren()) do
+                if messageLabel:IsA("TextLabel") then
+                    messageLabel.BackgroundTransparency = 0.5
+                    messageLabel.TextTransparency = 0
+                end
+            end
+            task.wait(0.001)
+            MessageInput.Text = ""
+        end
+    end)
+end
+
 createMainGui()
 createScoreboard()
 createTeamsFrame()
+createChat()
 
 for _, team in ipairs(Teams:GetTeams()) do
     if team.Name ~= "Spectators" and team.Name ~= "Neutral" then
