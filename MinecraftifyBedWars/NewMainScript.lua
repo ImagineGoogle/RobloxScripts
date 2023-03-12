@@ -1,5 +1,16 @@
+--[[
+	UI CODE IS OLD & PASTED FROM THE OLD SCRIPT (gui2lua moment, really cringe)
+	I didn't know RichText existed :skull:
+	- MC Ban Screen (copied, didn't know xylex posted it at the time)
+	- MC Scoreboard (copied, xylex never released it so yeah I remade it)
+	- MC Chat (hypixel bw kill feed in chat as well)
+	- Block Textures (only works in your hand, bedwars changed how textures work lmao)
+	- Really Bad F3 Menu
+	A lot of things were skidded from vape because I was so incompetent
+]]
+
 getgenv().MinecraftifyBedWarsConfig = {
-	["ExecuteOnTeleport"] = false,
+	["ExecuteOnTeleport"] = false, -- doesn't support config because I never use queueonteleport lol, autoexec is much better
 	["TransparentChat"] = false,
 	["OpenChatKeyCode"] = Enum.KeyCode.Slash,
     ["ScoreboardAliveText"] = "✓",
