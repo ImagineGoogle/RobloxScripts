@@ -3,7 +3,7 @@
 	I didn't know RichText existed :skull:
 	- MC Ban Screen (copied, didn't know xylex posted it at the time)
 	- MC Scoreboard (copied, xylex never released it so yeah I remade it)
-	- MC Chat (hypixel bw kill feed in chat as well)
+	- MC Chat (hypixel bw kill feed in chat as well - kills are detected in a really bad way, I didn't understand the death event at the time :skul:)
 	- Block Textures (only works in your hand, bedwars changed how textures work lmao)
 	- Really Bad F3 Menu
 	A lot of things were skidded from vape because I was so incompetent
